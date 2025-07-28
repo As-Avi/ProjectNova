@@ -1,0 +1,1 @@
+"ConnectionString": "Server=tcp:mkp-devsvr0-eu-ks.8da8c2b450e8.database.windows.net,1433;Persist Security Info=False;User ID=sqlstgcopy;Password=J3ReXTWrDi2JS48svH9l;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=10;Initial Catalog=$DATABASENAME;",
