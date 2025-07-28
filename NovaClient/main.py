@@ -7,34 +7,64 @@
 import tkinter as tk
 from tkinter import ttk
 import pandas as pd
+import seaborn as sns
 import requests
 from pandas.io.json import read_json
 
-def startForm(name):
+def startForm(name, urls):
     root = tk.Tk()
     root.title(name)
     root.geometry("1200x500")
 
+    # Create a frame to hold the treeview and scrollbars
     frame = ttk.Frame(root)
+    frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-    #load dataframe
-    #df = loadData()
-    df = loadDataFromUrl()
+    # Create a container frame for the treeview
+    tree_frame = ttk.Frame(frame)
+    tree_frame.pack(fill=tk.BOTH, expand=True)
+
+    try:
+        if urls.startswith('http'):
+            df = loadDataFromUrl(url)
+        else:
+            raise ValueError("Invalid URL format. Please provide a valid URL starting with 'http'.")
+    except Exception as e:
+        print(f"Error loading data: {e}")
+        df = sns.load_dataset("titanic")  #dataset casuale, poi modifichiamo 
+
+    #non bisognerebbe fare pulizia del dataframe? Se ho elementi nulli, oppure se ho 1/0 al posto di True/False?
+    df = df.dropna()  
+    
+    for c in df.columns:
+        if set(df[c].unique()).issubset({0,1}):
+            df[c] = df[c].astype(bool)
 
     #generate layout table with columns and header
-    treeview = generateLayout(frame, df)
+    treeview = generateLayout(tree_frame, df)
 
     #show data in table
     showData(treeview, df)
 
     #create a vertical scrollbar
-    v_scrollbar = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=treeview.yview)
+    v_scrollbar = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=treeview.yview)
     treeview.configure(yscrollcommand=v_scrollbar.set)
 
-    #pack the treeview
-    treeview.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    #create a horizontal scrollbar
+    h_scrollbar = ttk.Scrollbar(tree_frame, orient=tk.HORIZONTAL, command=treeview.xview)
+    treeview.configure(xscrollcommand=h_scrollbar.set)
+
     #pack the scrollbar
-    v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    treeview.grid(row=0, column=0, sticky='nsew')
+    v_scrollbar.grid(row=0, column=1, sticky="ns")
+    h_scrollbar.grid(row=1, column=0, sticky="ew")
+    #v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    #h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+
+    #configure the grid
+    tree_frame.grid_rowconfigure(0, weight=1)
+    tree_frame.grid_columnconfigure(0, weight=1)
+    
     #pack the frame
     frame.pack(fill=tk.BOTH,expand=True, padx=10, pady=10)
 
@@ -58,6 +88,7 @@ def sort_treeview(tree, col, descending):
         tree.move(item, '', index)
     tree.heading(col, command=lambda: sort_treeview(tree, col, not descending))
 
+
 def showData(treeview, df):
     r_set = df.to_numpy().tolist()
     for dt in r_set:
@@ -65,17 +96,16 @@ def showData(treeview, df):
         treeview.insert("", tk.END, values = v)
 
 
-
-def loadDataFromUrl():
-    url = 'http://localhost:8000/api/view'
+def loadDataFromUrl(url):
 
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
         return read_json(data, compression='gizp')        
     else:
-        return None
+        raise Exception(f"Failed to fetch data from URL: {response.status_code}")
 
 
 if __name__ == "__main__":
-    startForm("Users")
+    url = 'http://localhost:8000/api/view'
+    startForm("Users", url)
