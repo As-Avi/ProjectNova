@@ -8,6 +8,7 @@ import tkinter as tk
 from tkinter import ttk
 import pandas as pd
 import seaborn as sns
+import PySimpleGUI as sg
 import requests
 from pandas.io.json import read_json
 
@@ -97,15 +98,46 @@ def showData(treeview, df):
 
 
 def loadDataFromUrl(url):
-
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
-        return read_json(data, compression='gizp')        
+        return read_json(data, compression='gzip')        
     else:
         raise Exception(f"Failed to fetch data from URL: {response.status_code}")
 
 
+def input_layout():
+    layout = [
+    [sg.Text("Endpoint Server:"), sg.Input(key="-ENDPOINT-")],
+    [sg.Text("ID Configurazione:"), sg.Input(key="-CONFIG-")],
+    [sg.Text("Lingua:"), sg.Combo(["IT", "EN"], key="-LANG-")],
+    [sg.Button("Avvia"), sg.Exit()]
+    ]
+
+    window = sg.Window("Configurazione", layout)
+
+    while True:
+        event, values = window.read()
+        if event in (sg.WIN_CLOSED, "Exit"):
+            break
+        elif event == "Avvia":
+            if not values['-ENDPOINT-'] or not values['-CONFIG-'] or not values['-LANG-']:
+                sg.popup_error("Please fill in all fields.")
+                continue
+            if values['-ENDPOINT-'].startswith('http') is False:
+                sg.popup_error("Endpoint must start with 'http'.")
+                continue
+            if not values['-CONFIG-'].isdigit():
+                sg.popup_error("Configuration ID must be a number.")
+                continue
+            list = [values['-ENDPOINT-'], values['-CONFIG-'], values['-LANG-']]
+            window.close()
+            return list
+
+    window.close()
+
+
 if __name__ == "__main__":
     url = 'http://localhost:8000/api/view'
+    lista = input_layout() #ottengo l'endpoint, l'id e la lingua
     startForm("Users", url)
