@@ -7,10 +7,10 @@
 import tkinter as tk
 from tkinter import ttk
 import pandas as pd
-import seaborn as sns
-import PySimpleGUI as sg
 import requests
 from pandas.io.json import read_json
+import sys
+
 
 def startForm(name, urls):
     root = tk.Tk()
@@ -32,10 +32,10 @@ def startForm(name, urls):
             raise ValueError("Invalid URL format. Please provide a valid URL starting with 'http'.")
     except Exception as e:
         print(f"Error loading data: {e}")
-        df = sns.load_dataset("titanic")  #dataset casuale, poi modifichiamo 
+        return
 
     #non bisognerebbe fare pulizia del dataframe? Se ho elementi nulli, oppure se ho 1/0 al posto di True/False?
-    df = df.dropna()  
+    #df = df.dropna()  
     
     for c in df.columns:
         if set(df[c].unique()).issubset({0,1}):
@@ -106,38 +106,20 @@ def loadDataFromUrl(url):
         raise Exception(f"Failed to fetch data from URL: {response.status_code}")
 
 
-def input_layout():
-    layout = [
-    [sg.Text("Endpoint Server:"), sg.Input(key="-ENDPOINT-")],
-    [sg.Text("ID Configurazione:"), sg.Input(key="-CONFIG-")],
-    [sg.Text("Lingua:"), sg.Combo(["IT", "EN"], key="-LANG-")],
-    [sg.Button("Avvia"), sg.Exit()]
-    ]
-
-    window = sg.Window("Configurazione", layout)
-
-    while True:
-        event, values = window.read()
-        if event in (sg.WIN_CLOSED, "Exit"):
-            break
-        elif event == "Avvia":
-            if not values['-ENDPOINT-'] or not values['-CONFIG-'] or not values['-LANG-']:
-                sg.popup_error("Please fill in all fields.")
-                continue
-            if values['-ENDPOINT-'].startswith('http') is False:
-                sg.popup_error("Endpoint must start with 'http'.")
-                continue
-            if not values['-CONFIG-'].isdigit():
-                sg.popup_error("Configuration ID must be a number.")
-                continue
-            list = [values['-ENDPOINT-'], values['-CONFIG-'], values['-LANG-']]
-            window.close()
-            return list
-
-    window.close()
 
 
 if __name__ == "__main__":
-    url = 'http://localhost:8000/api/view'
-    lista = input_layout() #ottengo l'endpoint, l'id e la lingua
-    startForm("Users", url)
+    
+    print(sys.argv)
+
+    #leggo i parametri dalla linea di comando
+    param_1 = sys.argv[1] #Title
+    param_2 = sys.argv[2] #url
+    param_3 = sys.argv[3] #file json
+    param_4 = sys.argv[4] #language
+
+    #compongo l'url con i parametri che mi serviranno lato server
+    url = param_2 + '?config=' + param_3 + '&language=' + param_4
+
+    #creo la form
+    startForm(param_1, url)

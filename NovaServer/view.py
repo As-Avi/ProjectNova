@@ -1,3 +1,4 @@
+import string
 from fastapi import Depends, FastAPI, Body, Response, HTTPException, Request
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import PlainTextResponse
@@ -14,6 +15,7 @@ import os, errno
 import time
 import pandas as pd
 import pyodbc
+import json
 
 router = APIRouter(prefix="/api")
 
@@ -23,25 +25,36 @@ secret_password: str = ""
 basic: HTTPBasicCredentials = HTTPBasic()
 
 @router.get("/view")
-async def get()->Any:
+async def get(config, language)->Any:
 
-    df = __loadData()
+    #leggo il file di configurazione
+    with open('config/' + config, 'r') as file:
+        data = json.load(file)
+
+    if data['Type'] == 'SqlServer':
+        df = __loadDataSqlServer(data)
+    elif data['Type'] == 'CSV':
+        df = __loadDataCSV(data)
+    else:
+        return None #da migliorare gestione errore
+
     return df.to_json(orient='records', compression='gzip')    
 
+def __loadDataCSV(data):
+    return  pd.read_csv("data/" + data['File']) #da migliorare gestione errore
 
-def __loadData():
-    #df = pd.read_csv("test.csv")
-    
-    #drivers = pyodbc.drivers()
-    cn = pyodbc.connect('DRIVER={ODBC Driver 18 for SQL Server};Server=tcp:mkp-devsvr0-eu-ks.8da8c2b450e8.database.windows.net,1433;UID=sqlstgcopy;PWD=***;DATABASE=KeySystems-Customer;')
-    cursor = cn.cursor()
-    query = "SELECT Id AS ID, Name AS NAME, EmailAddress AS EMAIL FROM dbo.Users ORDER BY Name"
-    df = pd.read_sql(query, cn)
-    
-    #stream = io.StringIO()
-    #df.to_csv(stream, sep=',', encoding='utf-8', index=False)
-    #stream.seek(0)
-    # df = pd.DataFrame(data)
+def __loadDataSqlServer(data):
+    try:
+        #drivers = pyodbc.drivers()
+        cn = pyodbc.connect(data['ConnectionString'])
+        cursor = cn.cursor()
+        query = data['Query']
+        df = pd.read_sql(query, cn)
+        return df
+    except Exception as e:
+        sqlstate = e.args[0]
+        print(e.args[1])
+        return None
 
     return df
 
