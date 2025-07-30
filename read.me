@@ -5,3 +5,38 @@ Richiede un database SQL Server opportunamente configurato
 
 Il client va lanciato con questi parametri per una connessione al file CSV
 Title http://localhost:8000/api/view file02.json it
+
+
+<parametro 1> <parametro 2> <parametro 3> <parametro 4>
+
+<parametro 1> è una stringa libera che viene visualizzata sulla barra del titolo della finestra (attenti agli spazi)
+
+<parametro 2> è l'url del server 
+              per esempio http://localhost:8000/api/view per le viste e http://localhost:8000/api/graph per i grafici
+<parametro 3> è il nome del file sul server (\config) che il consulente configurerà (vedi regole di configurazione)
+
+<parametro 4> lingua (it)
+
+
+regole di configurazione:
+
+{
+  "Type" : "SQLServer"
+}
+
+Il parametro Type serve ad identificare il tipo della fonte dati. Al momento gestiamo solo SQLServer o CSV
+
+A seconda del tipo della fonte dati il file avrà parametri differenti:
+
+Per Sql Server:
+
+{
+  "ConnectionString" : "<stringa di connessione>",
+  "Query": "<qyery>"
+}
+
+
+per file CSV:
+{
+  "File" : "<nome file sotto direcotry /data"
+}
