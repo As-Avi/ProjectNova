@@ -20,41 +20,49 @@ import json
 router = APIRouter(prefix="/api")
 
 # Basic Auth
-secret_user: str = ""
-secret_password: str = ""
+secret_user: str = "test"
+secret_password: str = "test"
 basic: HTTPBasicCredentials = HTTPBasic()
 
-@router.get("/view")
-async def get(config, language)->Any:
 
-    #leggo il file di configurazione
-    with open('config/' + config, 'r') as file:
+@router.get("/view")
+async def get(config, language, creds: HTTPBasicCredentials = Depends(basic)) -> Any:
+
+    __authentication(creds)
+
+    # leggo il file di configurazione
+    with open("config/" + config, "r") as file:
         data = json.load(file)
 
-    if data['Type'] == 'SqlServer':
+    if data["Type"] == "SqlServer":
         df = __loadDataSqlServer(data)
-    elif data['Type'] == 'CSV':
+    elif data["Type"] == "CSV":
         df = __loadDataCSV(data)
     else:
-        return None #da migliorare gestione errore
+        raise HTTPException(status_code=502, detail="Wrong Type")
 
-    return df.to_json(orient='records', compression='gzip')    
+    if df is None: 
+         raise HTTPException(status_code=501, detail="Empty Data Frame")
+
+    return df.to_json(orient="records")
+
 
 def __loadDataCSV(data):
-    return  pd.read_csv("data/" + data['File']) #da migliorare gestione errore
+    return pd.read_csv("data/" + data["File"])  # da migliorare gestione errore
+
 
 def __loadDataSqlServer(data):
     try:
-        #drivers = pyodbc.drivers()
-        cn = pyodbc.connect(data['ConnectionString'])
+        # drivers = pyodbc.drivers()
+        cn = pyodbc.connect(data["ConnectionString"])
         cursor = cn.cursor()
-        query = data['Query']
+        query = data["Query"]
         df = pd.read_sql(query, cn)
         return df
     except Exception as e:
         sqlstate = e.args[0]
         print(e.args[1])
-        return None
+        raise HTTPException(status_code=500, detail=e.args[1])
 
     return df
 
@@ -79,4 +87,3 @@ def __getVersion(request: Request) -> str:
         version = "1.0"
 
     return version
-

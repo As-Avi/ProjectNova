@@ -10,7 +10,8 @@ import pandas as pd
 import requests
 from pandas.io.json import read_json
 import sys
-
+from io import StringIO
+from requests.auth import HTTPBasicAuth
 
 def startForm(name, urls):
     root = tk.Tk()
@@ -98,12 +99,12 @@ def showData(treeview, df):
 
 
 def loadDataFromUrl(url):
-    response = requests.get(url)
+    response = requests.get(url, auth=HTTPBasicAuth('test', 'test'), verify=False)
     if response.status_code == 200:
         data = response.json()
-        return read_json(data, compression='gzip')        
+        return read_json(StringIO(data))        
     else:
-        raise Exception(f"Failed to fetch data from URL: {response.status_code}")
+        raise Exception(f"Failed to fetch data from URL: {response.url} code: {response.status_code} message: {response.text}")
 
 
 

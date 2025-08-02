@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
 from starlette.middleware.cors import CORSMiddleware
 import uvicorn
+import ssl
 
 import view
 
@@ -49,4 +50,6 @@ if __name__ == "__main__":
         limit_concurrency=4,
         log_level="debug",
         use_colors=True,
+        # ssl_keyfile='./cert/www.nova.net-2025-08-02-092933.pkey',
+        # ssl_certfile='./cert/www.nova.net-2025-08-02-092933.cer'
     )

@@ -7,3 +7,4 @@ devtools
 numpy
 python-dotenv
 requests
+cryptography

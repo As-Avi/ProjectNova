@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>MSBuild|NovaServerEnv|$(MSBuildProjectFullPath)</InterpreterId>
+    <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -19,6 +19,11 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="cert\www.nova.net-2025-08-02-092933.cer" />
+    <Content Include="cert\www.nova.net-2025-08-02-092933.csr" />
+    <Content Include="cert\www.nova.net-2025-08-02-092933.p12" />
+    <Content Include="cert\www.nova.net-2025-08-02-092933.pkey" />
+    <Content Include="config\file03.json" />
     <Content Include="config\file01.json" />
     <Content Include="config\file02.json" />
     <Content Include="data\test.csv" />
@@ -29,6 +34,15 @@
     <Compile Include="view.py" />
   </ItemGroup>
   <ItemGroup>
+    <Interpreter Include="env\">
+      <Id>env</Id>
+      <Version>3.9</Version>
+      <Description>env (Python 3.9 (64-bit))</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X64</Architecture>
+    </Interpreter>
     <Interpreter Include="NovaServerEnv\">
       <Id>NovaServerEnv</Id>
       <Version>3.13</Version>
@@ -40,6 +54,7 @@
     </Interpreter>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="cert\" />
     <Folder Include="data\" />
     <Folder Include="config\" />
   </ItemGroup>
