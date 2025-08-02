@@ -12,6 +12,8 @@ import requests
 from pandas.io.json import read_json
 import sys
 from io import StringIO
+import os
+from dotenv import load_dotenv
 from requests.auth import HTTPBasicAuth
 
 
@@ -60,18 +62,22 @@ class App(tk.Tk):
 
                 # non bisognerebbe fare pulizia del dataframe? Se ho elementi nulli, oppure se ho 1/0 al posto di True/False?
                 # df = df.dropna()
+                return True
             else:
-                raise ValueError(
-                    "Invalid URL format. Please provide a valid URL starting with 'http'."
-                )
+                messagebox.showerror(title="Error", message=f"Invalid URL format. Please provide a valid URL starting with 'http'.")
+                return False
+                # raise ValueError(
+                #     "Invalid URL format. Please provide a valid URL starting with 'http'."
+                # )
         except Exception as e:
             messagebox.showerror(title="Error", message=f"Error loading data: {e}")
+            return False
 
     # Start the main form and display the data
     def startForm(self):
         self.change_cursor(True)
-        self.loadData()
-
+        ret = self.loadData()
+        if ret == False: return
         # generate layout table with columns and header
         self.generateLayout(self.tree_frame, self.df)
 
@@ -142,7 +148,9 @@ class App(tk.Tk):
 
     # Function to load data from a URL
     def loadDataFromUrl(self, url):
-        response = requests.get(url, auth=HTTPBasicAuth("test", "test"), verify=False)
+        secret_user = os.getenv("USER")
+        secret_password = os.getenv("PWD")
+        response = requests.get(url, auth=HTTPBasicAuth(secret_user, secret_password), verify=False)
         if response.status_code == 200:
             data = response.json()
             return read_json(StringIO(data))
@@ -153,12 +161,11 @@ class App(tk.Tk):
 
     # Function to handle key press events
     def key_press(self, event):
-        if event.keycode == 112:
+        if event.keycode == 112:#F1
             print("F1 is pressed")
-        elif event.keycode == 114:
+        elif event.keycode == 114:#F3
             print("F3 is pressed")
-        elif event.keycode == 121:
-            print("F10 is pressed")   
+        elif event.keycode == 121:#F10
             self.startForm()
 
     # Function to clean the Treeview
@@ -169,8 +176,10 @@ class App(tk.Tk):
 
 # Function Min to run the application
 if __name__ == "__main__":
-
     print(sys.argv)
+
+    #leggo i parametri dal file .env
+    load_dotenv()
 
     # leggo i parametri dalla linea di comando
     Title = sys.argv[1]  # Title

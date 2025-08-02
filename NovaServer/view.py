@@ -107,8 +107,6 @@ def __loadDataSqlServer(data):
 # authentication
 ########################################
 def __authentication(creds: HTTPBasicCredentials):
-
-    
     secret_user = os.getenv("USER")
     secret_password = os.getenv("PWD")
 
