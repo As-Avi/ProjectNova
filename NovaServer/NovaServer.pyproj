@@ -19,6 +19,7 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".env" />
     <Content Include="cert\www.nova.net-2025-08-02-092933.cer" />
     <Content Include="cert\www.nova.net-2025-08-02-092933.csr" />
     <Content Include="cert\www.nova.net-2025-08-02-092933.p12" />

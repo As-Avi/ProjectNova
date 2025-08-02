@@ -12,37 +12,67 @@ import requests
 from pathlib import Path
 import uvicorn
 import os, errno
+from dotenv import load_dotenv
 import time
 import pandas as pd
 import pyodbc
 import json
+import logging
 
 router = APIRouter(prefix="/api")
 
+load_dotenv()
+
 # Basic Auth
-secret_user: str = "test"
-secret_password: str = "test"
+secret_user: str = ""
+secret_password: str = ""
 basic: HTTPBasicCredentials = HTTPBasic()
+
+log_level = int(os.getenv("LOG_LEVEL"))
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    format="%(asctime)s %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    filename="Novi_server.log",
+    encoding="utf-8",
+    level=log_level
+)
 
 
 @router.get("/view")
-async def get(config, language, creds: HTTPBasicCredentials = Depends(basic)) -> Any:
+async def get(
+    config, language, request: Request, creds: HTTPBasicCredentials = Depends(basic)
+) -> Any:
 
+    logger.info(f"view:start config:'{config}' language:'{language}'")
+    logger.info(f"view:start Client Host: '{request.client.host}'")
+
+    # autenticazione
     __authentication(creds)
+    # controllo versione
+    version: str = __getVersion(request)
 
     # leggo il file di configurazione
     with open("config/" + config, "r") as file:
         data = json.load(file)
 
-    if data["Type"] == "SqlServer":
+    type = data["Type"]
+    logger.info(f"view:{type}")
+
+    if type == "SqlServer":
         df = __loadDataSqlServer(data)
-    elif data["Type"] == "CSV":
+    elif type == "CSV":
         df = __loadDataCSV(data)
     else:
+        logger.error(f"Wrong Type")
         raise HTTPException(status_code=502, detail="Wrong Type")
 
-    if df is None: 
-         raise HTTPException(status_code=501, detail="Empty Data Frame")
+    if df is None:
+        logger.error(f"Empty Data Frame")
+        raise HTTPException(status_code=501, detail="Empty Data Frame")
+
+    logger.info("view:end")
 
     return df.to_json(orient="records")
 
@@ -53,15 +83,21 @@ def __loadDataCSV(data):
 
 def __loadDataSqlServer(data):
     try:
-        # drivers = pyodbc.drivers()
-        cn = pyodbc.connect(data["ConnectionString"])
-        cursor = cn.cursor()
+        connectionString = data["ConnectionString"]
         query = data["Query"]
-        df = pd.read_sql(query, cn)
+
+        logger.info(f"__loadDataSqlServer:{connectionString}")
+        logger.info(f"__loadDataSqlServer:{query}")
+        # drivers = pyodbc.drivers()
+        cn = pyodbc.connect(connectionString)
+        cursor = cn.cursor()
+
+        df = pd.read_sql(
+            query, cn
+        )  # warning perchè Sql server non è un database nativo di pandas (usare SQLAlchemy)
         return df
     except Exception as e:
-        sqlstate = e.args[0]
-        print(e.args[1])
+        logger.error(f"Error in __loadDataSqlServer: {str(e)}")
         raise HTTPException(status_code=500, detail=e.args[1])
 
     return df
@@ -71,10 +107,16 @@ def __loadDataSqlServer(data):
 # authentication
 ########################################
 def __authentication(creds: HTTPBasicCredentials):
+
+    
+    secret_user = os.getenv("USER")
+    secret_password = os.getenv("PWD")
+
     if (
         creds.username.casefold() != secret_user.casefold()
         or creds.password != secret_password
     ):
+        logger.error(f"Incorrect username or password")
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
 

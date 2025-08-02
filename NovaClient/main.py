@@ -1,10 +1,10 @@
 #sudo apt install python3-tk
-#pip install tk
-#pip install pandas
+#pip install -r requirements.txt
 #plus2net.com/python/tkinter-df-search.php
 #https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16&tabs=ubuntu18-install%2Calpine17-install%2Cdebian8-install%2Credhat7-13-install%2Crhel7-offline
 
 import tkinter as tk
+from tkinter import messagebox 
 from tkinter import ttk
 import pandas as pd
 import requests
@@ -32,7 +32,7 @@ def startForm(name, urls):
         else:
             raise ValueError("Invalid URL format. Please provide a valid URL starting with 'http'.")
     except Exception as e:
-        print(f"Error loading data: {e}")
+        messagebox.showerror(title='Error', message=f"Error loading data: {e}")
         return
 
     #non bisognerebbe fare pulizia del dataframe? Se ho elementi nulli, oppure se ho 1/0 al posto di True/False?
@@ -60,8 +60,6 @@ def startForm(name, urls):
     treeview.grid(row=0, column=0, sticky='nsew')
     v_scrollbar.grid(row=0, column=1, sticky="ns")
     h_scrollbar.grid(row=1, column=0, sticky="ew")
-    #v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-    #h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
 
     #configure the grid
     tree_frame.grid_rowconfigure(0, weight=1)
@@ -105,8 +103,6 @@ def loadDataFromUrl(url):
         return read_json(StringIO(data))        
     else:
         raise Exception(f"Failed to fetch data from URL: {response.url} code: {response.status_code} message: {response.text}")
-
-
 
 
 if __name__ == "__main__":

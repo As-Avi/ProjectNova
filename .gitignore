@@ -1,3 +1,4 @@
 ﻿NovaClient/.vs
 NovaServer/.vs
 NovaServer/env
+*.log
