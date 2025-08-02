@@ -150,7 +150,8 @@ class App(tk.Tk):
     def loadDataFromUrl(self, url):
         secret_user = os.getenv("USER")
         secret_password = os.getenv("PWD")
-        response = requests.get(url, auth=HTTPBasicAuth(secret_user, secret_password), verify=False)
+        version = os.getenv("VERSION")
+        response = requests.get(url, auth=HTTPBasicAuth(secret_user, secret_password), verify=False, headers={"header-version":version})
         if response.status_code == 200:
             data = response.json()
             return read_json(StringIO(data))

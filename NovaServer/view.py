@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(
     format="%(asctime)s %(message)s",
     datefmt="%m/%d/%Y %I:%M:%S %p",
-    filename="Novi_server.log",
+    filename="Nova_Server.log",
     encoding="utf-8",
     level=log_level
 )
