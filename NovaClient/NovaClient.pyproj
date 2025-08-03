@@ -14,7 +14,7 @@
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
     <IsWindowsApplication>False</IsWindowsApplication>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
-    <CommandLineArguments>"Anagrafica Utente" http://localhost:8000/api/view file03.json it</CommandLineArguments>
+    <CommandLineArguments>"Anagrafica Utente" http://localhost:8000/api/view file01.json it</CommandLineArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -23,6 +23,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="main.py" />
+    <Compile Include="novaClient.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".env" />
