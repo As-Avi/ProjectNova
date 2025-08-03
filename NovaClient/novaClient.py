@@ -16,6 +16,8 @@ import os
 from dotenv import load_dotenv
 from requests.auth import HTTPBasicAuth
 
+from tkinter.messagebox import showinfo
+
 # This is a simple Tkinter application to display data from a JSON endpoint in a table format.
 class App(tk.Tk):
     def __init__(self, title, url):
@@ -31,6 +33,10 @@ class App(tk.Tk):
         # per catturare l'evento key press
         self.bind("<Key>", self.key_press)
         # self.bind("<Motion>", self.change_cursor)
+
+        # self.button_bonus = ttk.Button(self, text="Cerca", command=self.popup_find)
+        # self.button_bonus.pack()
+
 
         self.prepare()
         self.startForm()
@@ -161,11 +167,13 @@ class App(tk.Tk):
 
     # Function to handle key press events
     def key_press(self, event):
-        if event.keycode == 112:#F1
+        if event.keycode == 112:#F1 HELP
             print("F1 is pressed")
-        elif event.keycode == 114:#F3
+        elif event.keycode == 114:#F3 CERCA
             print("F3 is pressed")
-        elif event.keycode == 121:#F10
+            self.popup_find()
+        elif event.keycode == 121:#F10 REFRESH
+            self.clean()
             self.startForm()
 
     # Function to clean the Treeview
@@ -173,6 +181,13 @@ class App(tk.Tk):
         for i in self.treeview.get_children():
             self.treeview.delete(i)
 
+    def popup_find(self):
+        win = tk.Toplevel(self)
+        win.geometry("300x200")
+        win.wm_title("Window")
 
+        e1 = tk.Entry(win)
+        e1.grid(row=0, column=0)
 
+        tk.Button(win, text='Find', command=self.clean).grid(row=1, column=0, sticky=tk.W)
 

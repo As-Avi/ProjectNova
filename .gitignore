@@ -2,3 +2,5 @@
 NovaServer/.vs
 NovaServer/env
 *.log
+NovaServer/__pycache__
+NovaClient/__pycache__
