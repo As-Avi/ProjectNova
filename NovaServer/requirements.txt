@@ -3,7 +3,7 @@ uvicorn
 gunicorn
 pyodbc
 pandas
-devtools
+# devtools? conda install conda-forge::r-devtools
 numpy
 python-dotenv
 requests

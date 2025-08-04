@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Lory",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "main.py",
+            "args": ["Title", "http://localhost:8000/api/view",  "file02.json", "it"]
+        }
+    ]
+}

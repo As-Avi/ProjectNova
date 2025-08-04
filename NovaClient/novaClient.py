@@ -1,4 +1,3 @@
-
 # sudo apt install python3-tk
 # pip install -r requirements.txt
 # plus2net.com/python/tkinter-df-search.php
@@ -34,10 +33,6 @@ class App(tk.Tk):
         self.bind("<Key>", self.key_press)
         # self.bind("<Motion>", self.change_cursor)
 
-        # self.button_bonus = ttk.Button(self, text="Cerca", command=self.popup_find)
-        # self.button_bonus.pack()
-
-
         self.prepare()
         self.startForm()
 
@@ -47,7 +42,8 @@ class App(tk.Tk):
         self.frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         # Create a container frame for the treeview
         self.tree_frame = ttk.Frame(self.frame)
-        self.tree_frame.pack(fill=tk.BOTH, expand=True)
+        self.tree_frame.pack(fill=tk.BOTH, 
+                             expand=True)
 
     # TODO: la stringa 1200x500 deve essere presa da un file
     # che si crea la momento della chiusura della form
@@ -60,17 +56,11 @@ class App(tk.Tk):
         try:
             if self.url.startswith("http"):
                 self.df = self.loadDataFromUrl(self.url)
-
-                for c in self.df.columns:
-                    if set(self.df[c].unique()).issubset({0, 1}):
-                        self.df[c] = self.df[c].astype(bool)
-
-                # non bisognerebbe fare pulizia del dataframe? Se ho elementi nulli, oppure se ho 1/0 al posto di True/False?
-                # df = df.dropna()
                 return True
             else:
                 messagebox.showerror(title="Error", message=f"Invalid URL format. Please provide a valid URL starting with 'http'.")
                 return False
+
                 # raise ValueError(
                 #     "Invalid URL format. Please provide a valid URL starting with 'http'."
                 # )
@@ -167,12 +157,12 @@ class App(tk.Tk):
 
     # Function to handle key press events
     def key_press(self, event):
-        if event.keycode == 112:#F1 HELP
+        if event.keysym == "F1":#F1 HELP
             print("F1 is pressed")
-        elif event.keycode == 114:#F3 CERCA
+        elif event.keysym == "F3":#F3 CERCA
             print("F3 is pressed")
             self.popup_find()
-        elif event.keycode == 121:#F10 REFRESH
+        elif event.keysym == "F10":#F10 REFRESH
             self.clean()
             self.startForm()
 

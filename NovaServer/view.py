@@ -49,7 +49,7 @@ async def get(
     logger.info(f"view:start Client Host: '{request.client.host}'")
 
     # autenticazione
-    __authentication(creds)
+    #__authentication(creds)
     # controllo versione
     version: str = __getVersion(request)
 
@@ -94,7 +94,7 @@ def __loadDataSqlServer(data):
 
         df = pd.read_sql(
             query, cn
-        )  # warning perchè Sql server non è un database nativo di pandas (usare SQLAlchemy)
+        )  # warning perchï¿½ Sql server non ï¿½ un database nativo di pandas (usare SQLAlchemy)
         return df
     except Exception as e:
         logger.error(f"Error in __loadDataSqlServer: {str(e)}")
