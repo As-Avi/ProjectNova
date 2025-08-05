@@ -85,27 +85,29 @@ class App(tk.Tk):
         # show data in table
         self.showData(self.treeview, self.df)
 
-        # # create a vertical scrollbar
+        # create a vertical scrollbar
         v_scrollbar = ttk.Scrollbar(
             self.tree_frame, orient=tk.VERTICAL, command=self.treeview.yview
         )
         self.treeview.configure(yscrollcommand=v_scrollbar.set)
 
-        # # create a horizontal scrollbar
+        # create a horizontal scrollbar
         h_scrollbar = ttk.Scrollbar(
             self.tree_frame, orient=tk.HORIZONTAL, command=self.treeview.xview
         )
         self.treeview.configure(xscrollcommand=h_scrollbar.set)
 
-        # # pack the scrollbar
+        # grid the widgets
         self.treeview.grid(row=0, column=0, sticky="nsew")
-
         v_scrollbar.grid(row=0, column=1, sticky="ns")
         h_scrollbar.grid(row=1, column=0, sticky="ew")
 
-        # # configure the grid
+        # configure the grid weights
         self.tree_frame.grid_rowconfigure(0, weight=1)
         self.tree_frame.grid_columnconfigure(0, weight=1)
+        
+        # Force update to ensure proper scrollbar initialization
+        self.tree_frame.update_idletasks()
 
         self.change_cursor(False)
 
@@ -130,6 +132,8 @@ class App(tk.Tk):
                 text=c,
                 command=lambda c=c: self.sort_treeview(self.treeview, c, False),
             )
+            # Set a minimum width for each column to ensure horizontal scrolling works
+            self.treeview.column(c, minwidth=100, width=120)
 
     # Function to sort the Treeview by column
     def sort_treeview(self, tree, col, descending):

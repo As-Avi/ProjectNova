@@ -39,6 +39,10 @@ logging.basicConfig(
     level=log_level
 )
 
+@router.get("/combo")
+async def combo(request: Request, creds: HTTPBasicCredentials = Depends(basic)) -> Any:
+    logger.info(f"combo:start Client Host: '{request.client.host}'")
+    return [["Option 1", "Option 2", "Option 3"]]
 
 @router.get("/view")
 async def get(
