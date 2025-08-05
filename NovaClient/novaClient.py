@@ -1,8 +1,3 @@
-# sudo apt install python3-tk
-# pip install -r requirements.txt
-# plus2net.com/python/tkinter-df-search.php
-# https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16&tabs=ubuntu18-install%2Calpine17-install%2Cdebian8-install%2Credhat7-13-install%2Crhel7-offline
-
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
@@ -33,17 +28,28 @@ class App(tk.Tk):
         self.bind("<Key>", self.key_press)
         # self.bind("<Motion>", self.change_cursor)
 
+        #chiamata al server per caricare i dati per caricare il combobox
         self.prepare()
         self.startForm()
+        self.mainloop()
 
     # Prepare the main frame and treeview for displaying data
     def prepare(self):
         self.frame = ttk.Frame(self)
         self.frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        #create of a combo box for selecting endpoints/filters
+        self.toolbar_frame = ttk.Frame(self.frame)
+        self.toolbar_frame.pack(fill=tk.X, pady=(0, 10))
+        # Combobox for endpoint selection
+        ttk.Label(self.toolbar_frame, text="Piano di spedizione:", font=("Arial", 12, "bold")).pack(side=tk.LEFT, padx=(0, 5))
+        self.endpoint_combo = ttk.Combobox(self.toolbar_frame, values=["PDS2025000000123", "PDS2025000000456", "PDS2025000000789"], width=20, font=("Arial", 12), state="readonly")
+        self.endpoint_combo.pack(side=tk.LEFT, padx=(0, 10))
         # Create a container frame for the treeview
         self.tree_frame = ttk.Frame(self.frame)
-        self.tree_frame.pack(fill=tk.BOTH, 
-                             expand=True)
+        self.tree_frame.pack(fill=tk.BOTH, expand=True)
+        #create a label with info about the F10 key
+        self.info_label = ttk.Label(self.tree_frame, text="Premi F1 per l'help, F3 per la ricerca e F10 per aggiornare i dati")
+        self.info_label.grid(row=2, column=0, columnspan=2, pady=5)
 
     # TODO: la stringa 1200x500 deve essere presa da un file
     # che si crea la momento della chiusura della form
@@ -102,7 +108,6 @@ class App(tk.Tk):
         self.tree_frame.grid_columnconfigure(0, weight=1)
 
         self.change_cursor(False)
-        self.mainloop()
 
     #Function to change the cursor style
     def change_cursor(self, event):
@@ -139,6 +144,7 @@ class App(tk.Tk):
         r_set = df.to_numpy().tolist()
         for dt in r_set:
             v = [r for r in dt]
+            #qua aggiungere filtro con tkinter 
             treeview.insert("", tk.END, values=v)
 
     # Function to load data from a URL
