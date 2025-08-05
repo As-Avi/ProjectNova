@@ -7,6 +7,7 @@ from pandas.io.json import read_json
 import sys
 from io import StringIO
 import os
+import json
 from dotenv import load_dotenv
 from requests.auth import HTTPBasicAuth
 
@@ -17,12 +18,17 @@ class App(tk.Tk):
     def __init__(self, title, url):
         self.url = url
         self.name = title
+        self.config_file = "window_config.json"  # File per salvare le impostazioni
 
         tk.Tk.__init__(self)
 
         self.title(title)
 
-        self.geometry(self.getWindowsSize())
+        # Carica le dimensioni e posizione salvate
+        self.load_window_config()
+        
+        # Intercetta l'evento di chiusura della finestra
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         # per catturare l'evento key press
         self.bind("<Key>", self.key_press)
@@ -51,11 +57,77 @@ class App(tk.Tk):
         self.info_label = ttk.Label(self.tree_frame, text="Premi F1 per l'help, F3 per la ricerca e F10 per aggiornare i dati")
         self.info_label.grid(row=2, column=0, columnspan=2, pady=5)
 
-    # TODO: la stringa 1200x500 deve essere presa da un file
-    # che si crea la momento della chiusura della form
-    # se non esiste il file lo creo con i valori di default 1200x500
-    def getWindowsSize(self):
-        return "1200x500"
+    # Load window configuration from file
+    def load_window_config(self):
+        # Carica la configurazione della finestra dal file JSON
+        try:
+            if os.path.exists(self.config_file):
+                with open(self.config_file, 'r') as f:
+                    config = json.load(f)
+                
+                # Imposta geometria (dimensioni e posizione)
+                width = config.get('width', 1200)
+                height = config.get('height', 500)
+                x = config.get('x', 100)
+                y = config.get('y', 100)
+                
+                # Verifica che le coordinate non siano fuori schermo
+                screen_width = self.winfo_screenwidth()
+                screen_height = self.winfo_screenheight()
+                
+                if x < 0 or x > screen_width - 100:
+                    x = 100
+                if y < 0 or y > screen_height - 100:
+                    y = 100
+                
+                self.geometry(f"{width}x{height}+{x}+{y}")
+                
+                # Ripristina stato finestra (normale/massimizzata)
+                if config.get('maximized', False):
+                    self.state('zoomed')  # Linux/Windows
+                    
+            else:
+                # Valori di default se il file non esiste
+                self.geometry("1200x500+100+100")
+                
+        except Exception as e:
+            print(f"Errore nel caricamento configurazione: {e}")
+            self.geometry("1200x500+100+100")
+
+    def save_window_config(self):
+        # Salva la configurazione attuale della finestra nel file JSON
+        try:
+            # Ottieni dimensioni e posizione attuali
+            geometry = self.geometry()
+            
+            # Parse della stringa geometry (es: "1200x500+100+50")
+            size_part, pos_part = geometry.split('+', 1)
+            width, height = map(int, size_part.split('x'))
+            
+            # La posizione può avere segni negativi
+            pos_parts = pos_part.replace('-', '+-').split('+')
+            x = int(pos_parts[0]) if pos_parts[0] else int(pos_parts[1])
+            y = int(pos_parts[-1])
+            
+            config = {
+                'width': width,
+                'height': height,
+                'x': x,
+                'y': y,
+                'maximized': self.state() == 'zoomed'
+            }
+            
+            with open(self.config_file, 'w') as f:
+                json.dump(config, f, indent=2)
+                
+        except Exception as e:
+            print(f"Errore nel salvataggio configurazione: {e}")
+
+    def on_closing(self):
+        # Salva la configurazione prima di chiudere
+        self.save_window_config()
+        # Chiudi l'applicazione
+        self.destroy()
 
     # Load data from the specified URL
     def loadData(self):
