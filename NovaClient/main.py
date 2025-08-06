@@ -28,7 +28,7 @@ if __name__ == "__main__":
     param_4 = args.language
 
     # compongo l'url con i parametri che mi serviranno lato server
-    Url = param_2 + "?config=" + param_3 + "&language=" + param_4
+    #Url = param_2 + "?config=" + param_3 + "&language=" + param_4
 
     # creo la form
-    App(Title, Url)
+    App(Title, args.url, args.file,  args.language)

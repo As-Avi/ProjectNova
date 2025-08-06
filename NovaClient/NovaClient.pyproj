@@ -14,7 +14,7 @@
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
     <IsWindowsApplication>False</IsWindowsApplication>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
-    <CommandLineArguments>"Anagrafica Utente" http://localhost:8000/api/view file01.json it</CommandLineArguments>
+    <CommandLineArguments>-t "Piano Spedizione" -u http://localhost:8000 -f file03.json -l it</CommandLineArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />

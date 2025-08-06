@@ -13,11 +13,14 @@ from requests.auth import HTTPBasicAuth
 
 from tkinter.messagebox import showinfo
 
+
 # This is a simple Tkinter application to display data from a JSON endpoint in a table format.
 class App(tk.Tk):
-    def __init__(self, title, url):
+    def __init__(self, title, url, file, language):
         self.url = url
         self.name = title
+        self.file = file
+        self.language = language
         self.config_file = "window_config.json"  # File per salvare le impostazioni
 
         tk.Tk.__init__(self)
@@ -26,7 +29,7 @@ class App(tk.Tk):
 
         # Carica le dimensioni e posizione salvate
         self.load_window_config()
-        
+
         # Intercetta l'evento di chiusura della finestra
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
@@ -34,62 +37,108 @@ class App(tk.Tk):
         self.bind("<Key>", self.key_press)
         # self.bind("<Motion>", self.change_cursor)
 
-        #chiamata al server per caricare i dati per caricare il combobox
+        # loadata from server for combo
+        ######################################################
+        self.loadDataCombo()
+        ######################################################
+
+        # chiamata al server per caricare i dati per caricare il combobox
         self.prepare()
-        self.startForm()
+        self.loadView(False)
         self.mainloop()
 
     # Prepare the main frame and treeview for displaying data
     def prepare(self):
         self.frame = ttk.Frame(self)
         self.frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        #create of a combo box for selecting endpoints/filters
+        # create of a combo box for selecting endpoints/filters
         self.toolbar_frame = ttk.Frame(self.frame)
         self.toolbar_frame.pack(fill=tk.X, pady=(0, 10))
         # Combobox for endpoint selection
-        ttk.Label(self.toolbar_frame, text="Piano di spedizione:", font=("Arial", 12, "bold")).pack(side=tk.LEFT, padx=(0, 5))
-        self.endpoint_combo = ttk.Combobox(self.toolbar_frame, values=["PDS2025000000123", "PDS2025000000456", "PDS2025000000789"], width=20, font=("Arial", 12), state="readonly")
+        ttk.Label(
+            self.toolbar_frame, text="Piano di spedizione:", font=("Arial", 12, "bold")
+        ).pack(side=tk.LEFT, padx=(0, 5))
+        self.endpoint_combo = ttk.Combobox(
+            self.toolbar_frame,
+            values=self.ComboList,
+            width=20,
+            font=("Arial", 12),
+            state="readonly",
+        )
         self.endpoint_combo.pack(side=tk.LEFT, padx=(0, 10))
+
+
+        button = tk.Button(self.toolbar_frame, 
+                   text="Carica Dati (F10)", 
+                   command=self.button_clicked,
+                   activebackground="blue", 
+                   activeforeground="white",
+                   anchor="center",
+                   bd=3,
+                   bg="lightgray",
+                   cursor="hand2",
+                   disabledforeground="gray",
+                   fg="black",
+                   font=("Arial", 12),
+                   height=1,
+                   highlightbackground="black",
+                   highlightcolor="green",
+                   highlightthickness=2,
+                   # justify="right",
+                   overrelief="raised",
+                   padx=0,
+                   pady=0,
+                   width=15,
+                   wraplength=0)
+
+        button.pack(padx=20, pady=20)
+
         # Create a container frame for the treeview
         self.tree_frame = ttk.Frame(self.frame)
         self.tree_frame.pack(fill=tk.BOTH, expand=True)
-        #create a label with info about the F10 key
-        self.info_label = ttk.Label(self.tree_frame, text="Premi F1 per l'help, F3 per la ricerca e F10 per aggiornare i dati")
+        # create a label with info about the F10 key
+        self.info_label = ttk.Label(
+            self.tree_frame,
+            text="Premi F1 per l'help, F3 per la ricerca e F10 per aggiornare i dati",
+        )
         self.info_label.grid(row=2, column=0, columnspan=2, pady=5)
+
+    def button_clicked(self):
+        self.loadView(True)
 
     # Load window configuration from file
     def load_window_config(self):
         # Carica la configurazione della finestra dal file JSON
         try:
             if os.path.exists(self.config_file):
-                with open(self.config_file, 'r') as f:
+                with open(self.config_file, "r") as f:
                     config = json.load(f)
-                
+
                 # Imposta geometria (dimensioni e posizione)
-                width = config.get('width', 1200)
-                height = config.get('height', 500)
-                x = config.get('x', 100)
-                y = config.get('y', 100)
-                
+                width = config.get("width", 1200)
+                height = config.get("height", 500)
+                x = config.get("x", 100)
+                y = config.get("y", 100)
+
                 # Verifica che le coordinate non siano fuori schermo
                 screen_width = self.winfo_screenwidth()
                 screen_height = self.winfo_screenheight()
-                
+
                 if x < 0 or x > screen_width - 100:
                     x = 100
                 if y < 0 or y > screen_height - 100:
                     y = 100
-                
+
                 self.geometry(f"{width}x{height}+{x}+{y}")
-                
+
                 # Ripristina stato finestra (normale/massimizzata)
-                if config.get('maximized', False):
-                    self.state('zoomed')  # Linux/Windows
-                    
+                if config.get("maximized", False):
+                    self.state("zoomed")  # Linux/Windows
+
             else:
                 # Valori di default se il file non esiste
                 self.geometry("1200x500+100+100")
-                
+
         except Exception as e:
             print(f"Errore nel caricamento configurazione: {e}")
             self.geometry("1200x500+100+100")
@@ -99,27 +148,27 @@ class App(tk.Tk):
         try:
             # Ottieni dimensioni e posizione attuali
             geometry = self.geometry()
-            
+
             # Parse della stringa geometry (es: "1200x500+100+50")
-            size_part, pos_part = geometry.split('+', 1)
-            width, height = map(int, size_part.split('x'))
-            
+            size_part, pos_part = geometry.split("+", 1)
+            width, height = map(int, size_part.split("x"))
+
             # La posizione può avere segni negativi
-            pos_parts = pos_part.replace('-', '+-').split('+')
+            pos_parts = pos_part.replace("-", "+-").split("+")
             x = int(pos_parts[0]) if pos_parts[0] else int(pos_parts[1])
             y = int(pos_parts[-1])
-            
+
             config = {
-                'width': width,
-                'height': height,
-                'x': x,
-                'y': y,
-                'maximized': self.state() == 'zoomed'
+                "width": width,
+                "height": height,
+                "x": x,
+                "y": y,
+                "maximized": self.state() == "zoomed",
             }
-            
-            with open(self.config_file, 'w') as f:
+
+            with open(self.config_file, "w") as f:
                 json.dump(config, f, indent=2)
-                
+
         except Exception as e:
             print(f"Errore nel salvataggio configurazione: {e}")
 
@@ -130,13 +179,52 @@ class App(tk.Tk):
         self.destroy()
 
     # Load data from the specified URL
-    def loadData(self):
+    def loadDataCombo(self):
         try:
             if self.url.startswith("http"):
-                self.df = self.loadDataFromUrl(self.url)
+                self.ComboList = self.loadJsonFromUrl(
+                    self.url
+                    + "/api/combo"
+                    + "?config="
+                    + self.file
+                    + "&language="
+                    + self.language
+                )
                 return True
             else:
-                messagebox.showerror(title="Error", message=f"Invalid URL format. Please provide a valid URL starting with 'http'.")
+                messagebox.showerror(
+                    title="Error",
+                    message=f"Invalid URL format. Please provide a valid URL starting with 'http'.",
+                )
+                return False
+
+                # raise ValueError(
+                #     "Invalid URL format. Please provide a valid URL starting with 'http'."
+                # )
+        except Exception as e:
+            messagebox.showerror(title="Error", message=f"Error loading data: {e}")
+            return False
+
+    # Load data from the specified URL
+    def loadData(self, filter: str):
+        try:
+            if self.url.startswith("http"):
+                self.df = self.loadDataFromUrl(
+                    self.url
+                    + "/api/view"
+                    + "?config="
+                    + self.file
+                    + "&language="
+                    + self.language
+                    + "&filter="
+                    + filter
+                )
+                return True
+            else:
+                messagebox.showerror(
+                    title="Error",
+                    message=f"Invalid URL format. Please provide a valid URL starting with 'http'.",
+                )
                 return False
 
                 # raise ValueError(
@@ -147,10 +235,19 @@ class App(tk.Tk):
             return False
 
     # Start the main form and display the data
-    def startForm(self):
+    def loadView(self, cleanData=False):
         self.change_cursor(True)
-        ret = self.loadData()
-        if ret == False: return
+
+        if cleanData:
+            self.clean()
+
+        ######################################################
+
+        filter = self.endpoint_combo.get()
+        ret = self.loadData(filter)
+        ######################################################
+        if ret == False:
+            return
         # generate layout table with columns and header
         self.generateLayout(self.tree_frame, self.df)
 
@@ -177,13 +274,13 @@ class App(tk.Tk):
         # configure the grid weights
         self.tree_frame.grid_rowconfigure(0, weight=1)
         self.tree_frame.grid_columnconfigure(0, weight=1)
-        
+
         # Force update to ensure proper scrollbar initialization
         self.tree_frame.update_idletasks()
 
         self.change_cursor(False)
 
-    #Function to change the cursor style
+    # Function to change the cursor style
     def change_cursor(self, event):
         try:
             if event == True:
@@ -220,7 +317,7 @@ class App(tk.Tk):
         r_set = df.to_numpy().tolist()
         for dt in r_set:
             v = [r for r in dt]
-            #qua aggiungere filtro con tkinter 
+            # qua aggiungere filtro con tkinter
             treeview.insert("", tk.END, values=v)
 
     # Function to load data from a URL
@@ -228,7 +325,12 @@ class App(tk.Tk):
         secret_user = os.getenv("USER")
         secret_password = os.getenv("PWD")
         version = os.getenv("VERSION")
-        response = requests.get(url, auth=HTTPBasicAuth(secret_user, secret_password), verify=False, headers={"header-version":version})
+        response = requests.get(
+            url,
+            auth=HTTPBasicAuth(secret_user, secret_password),
+            verify=False,
+            headers={"header-version": version},
+        )
         if response.status_code == 200:
             data = response.json()
             return read_json(StringIO(data))
@@ -237,16 +339,33 @@ class App(tk.Tk):
                 f"Failed to fetch data from URL: {response.url} code: {response.status_code} message: {response.text}"
             )
 
+    def loadJsonFromUrl(self, url):
+        secret_user = os.getenv("USER")
+        secret_password = os.getenv("PWD")
+        version = os.getenv("VERSION")
+        response = requests.get(
+            url,
+            auth=HTTPBasicAuth(secret_user, secret_password),
+            verify=False,
+            headers={"header-version": version},
+        )
+        if response.status_code == 200:
+            data = response.json()
+            return data
+        else:
+            raise Exception(
+                f"Failed to fetch data from URL: {response.url} code: {response.status_code} message: {response.text}"
+            )
+
     # Function to handle key press events
     def key_press(self, event):
-        if event.keysym == "F1":#F1 HELP
+        if event.keysym == "F1":  # F1 HELP
             print("F1 is pressed")
-        elif event.keysym == "F3":#F3 CERCA
+        elif event.keysym == "F3":  # F3 CERCA
             print("F3 is pressed")
             self.popup_find()
-        elif event.keysym == "F10":#F10 REFRESH
-            self.clean()
-            self.startForm()
+        elif event.keysym == "F10":  # F10 REFRESH
+            self.loadView(True)
 
     # Function to clean the Treeview
     def clean(self):
@@ -261,5 +380,6 @@ class App(tk.Tk):
         e1 = tk.Entry(win)
         e1.grid(row=0, column=0)
 
-        tk.Button(win, text='Find', command=self.clean).grid(row=1, column=0, sticky=tk.W)
-
+        tk.Button(win, text="Find", command=self.clean).grid(
+            row=1, column=0, sticky=tk.W
+        )
