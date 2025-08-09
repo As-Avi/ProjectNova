@@ -1,1 +1,1 @@
-python -m uvicorn main:app --host 0.0.0.0
+python -m uvicorn main:app --host 192.168.1.62 --port 8000
