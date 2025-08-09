@@ -23,7 +23,7 @@ class App(tk.Tk):
         self.language = language
         self.config_file = "window_config.json"  # File per salvare le impostazioni
         self.ComboList = None
-        self.endpoint_combo  = None
+        self.endpoint_combo = None
         self.treeview = None
 
         tk.Tk.__init__(self)
@@ -58,43 +58,46 @@ class App(tk.Tk):
         self.toolbar_frame = ttk.Frame(self.frame)
         self.toolbar_frame.pack(fill=tk.X, pady=(0, 10))
         # Combobox for endpoint selection
-        if self.ComboList is not  None:
+        if self.ComboList is not None:
             ttk.Label(
-                self.toolbar_frame, text="Piano di spedizione:", font=("Arial", 12, "bold")
+                self.toolbar_frame,
+                text="Piano di spedizione:",
+                font=("Arial", 12, "bold"),
             ).pack(side=tk.LEFT, padx=(0, 5))
 
             self.endpoint_combo = ttk.Combobox(
-            self.toolbar_frame,
-            values=self.ComboList,
-            width=20,
-            font=("Arial", 12),
-            state="readonly",
+                self.toolbar_frame,
+                values=self.ComboList,
+                width=20,
+                font=("Arial", 12),
+                state="readonly",
             )
             self.endpoint_combo.pack(side=tk.LEFT, padx=(0, 10))
 
-
-        button = tk.Button(self.toolbar_frame, 
-                   text="Carica Dati (F10)", 
-                   command=self.button_clicked,
-                   activebackground="blue", 
-                   activeforeground="white",
-                   anchor="center",
-                   bd=3,
-                   bg="lightgray",
-                   cursor="hand2",
-                   disabledforeground="gray",
-                   fg="black",
-                   font=("Arial", 12),
-                   height=1,
-                   highlightbackground="black",
-                   highlightcolor="green",
-                   highlightthickness=2,
-                   # justify="right",
-                   overrelief="raised",
-                   padx=0,
-                   pady=0,
-                   width=15,
-                   wraplength=0)
+        button = tk.Button(
+            self.toolbar_frame,
+            text="Carica Dati (F10)",
+            command=self.button_clicked,
+            activebackground="blue",
+            activeforeground="white",
+            anchor="center",
+            bd=3,
+            bg="lightgray",
+            cursor="hand2",
+            disabledforeground="gray",
+            fg="black",
+            font=("Arial", 12),
+            height=1,
+            highlightbackground="black",
+            highlightcolor="green",
+            highlightthickness=2,
+            # justify="right",
+            overrelief="raised",
+            padx=0,
+            pady=0,
+            width=15,
+            wraplength=0,
+        )
 
         button.pack(padx=20, pady=20)
 
@@ -250,7 +253,7 @@ class App(tk.Tk):
         if self.endpoint_combo is not None:
             filter = self.endpoint_combo.get()
         else:
-            filter = ''
+            filter = ""
 
         ret = self.loadData(filter)
         ######################################################
@@ -323,10 +326,18 @@ class App(tk.Tk):
     # Insert data into the Treeview
     def showData(self, treeview, df):
         r_set = df.to_numpy().tolist()
+        a = 0
         for dt in r_set:
+            a = a + 1
             v = [r for r in dt]
             # qua aggiungere filtro con tkinter
-            treeview.insert("", tk.END, values=v)
+            if a % 2 == 0:
+                treeview.insert("", tk.END, values=v, tags=("oddrow",))
+            else:
+                treeview.insert("", tk.END, values=v, tags=("evenrow",))
+
+        treeview.tag_configure("oddrow", background="whitesmoke")
+        treeview.tag_configure("evenrow", background="white")
 
     # Function to load data from a URL
     def loadDataFromUrl(self, url):
@@ -377,7 +388,7 @@ class App(tk.Tk):
 
     # Function to clean the Treeview
     def clean(self):
-        if  self.treeview is not None:
+        if self.treeview is not None:
             for i in self.treeview.get_children():
                 self.treeview.delete(i)
 
