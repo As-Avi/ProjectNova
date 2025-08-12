@@ -4,3 +4,5 @@ NovaServer/env
 *.log
 NovaServer/__pycache__
 NovaClient/__pycache__
+NovaClient/build
+NovaClient/dist

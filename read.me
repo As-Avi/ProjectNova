@@ -5,45 +5,14 @@ Per generare un certificato per HTTPS
 https://getacert.com/cert/selfcert.pl?SID=a8e354A1g0jF92Afibg3C81j
 
 
-Il client va lanciato con questi parametri per una connessione a SQL Server
-Title http://localhost:8000/api/view file01.json it
-Richiede un database SQL Server opportunamente configurato
+Per creare un eseguibile windows:
+comand shell posizionarsi in NovaClient 
 
+installare
+pip install pyinstaller
 
-Il client va lanciato con questi parametri per una connessione al file CSV
-Title http://localhost:8000/api/view file02.json it
+e poi lanciare il comando
+pyinstaller main.py -n Nova --noconsole --onefile
 
-
-<parametro 1> <parametro 2> <parametro 3> <parametro 4>
-
-<parametro 1> è una stringa libera che viene visualizzata sulla barra del titolo della finestra (attenti agli spazi)
-
-<parametro 2> è l'url del server 
-              per esempio http://localhost:8000/api/view per le viste e http://localhost:8000/api/graph per i grafici
-<parametro 3> è il nome del file sul server (\config) che il consulente configurerà (vedi regole di configurazione)
-
-<parametro 4> lingua (it)
-
-
-regole di configurazione:
-
-{
-  "Type" : "SQLServer"
-}
-
-Il parametro Type serve ad identificare il tipo della fonte dati. Al momento gestiamo solo SQLServer o CSV
-
-A seconda del tipo della fonte dati il file avrà parametri differenti:
-
-Per Sql Server:
-
-{
-  "ConnectionString" : "<stringa di connessione>",
-  "Query": "<qyery>"
-}
-
-
-per file CSV:
-{
-  "File" : "<nome file sotto direcotry /data"
-}
+questo comando + molto più velioce a caricare l'eseguibile
+pyinstaller main.py -n Nova --noconsole --onedir --hide-console minimize-early
