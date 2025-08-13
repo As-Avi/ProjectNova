@@ -44,7 +44,7 @@ class App(tk.Tk):
 
         # loadata from server for combo
         ######################################################
-        if self.modulo == '1':
+        if self.modulo == '1' or self.modulo == 'VIEW_FILTERED':
             self.loadDataCombo()
         ######################################################
 
