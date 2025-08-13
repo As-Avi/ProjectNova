@@ -17,7 +17,8 @@ from tkinter.messagebox import showinfo
 
 # This is a simple Tkinter application to display data from a JSON endpoint in a table format.
 class App(tk.Tk):
-    def __init__(self, title, url, file, language):
+    def __init__(self, modulo, title, url, file, language):
+        self.modulo = modulo
         self.url = url
         self.name = title
         self.file = file
@@ -43,7 +44,8 @@ class App(tk.Tk):
 
         # loadata from server for combo
         ######################################################
-        self.loadDataCombo()
+        if self.modulo == '1':
+            self.loadDataCombo()
         ######################################################
 
         # chiamata al server per caricare i dati per caricare il combobox
@@ -63,7 +65,7 @@ class App(tk.Tk):
 
             clist = json.loads(self.ComboList)
             label = clist["label"]  # label del copmbobox
-            values = clist["values"] #array di valori del combobox
+            values = clist["values"]  # array di valori del combobox
 
             ttk.Label(
                 self.toolbar_frame,

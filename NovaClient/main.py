@@ -15,6 +15,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description="Parametri da inserire.")
    
+    parser.add_argument("-m", "--modulo", type=str, required=True, help="Modulo 0 = Vista | 1 = Vista con filtro [obbligatorio]")
     parser.add_argument("-t", "--title", type=str, required=True, help="Titolo del progetto [obbligatorio]")
     parser.add_argument("-u", "--url", type=str, required=True, help="URL del server [obbligatorio]")
     parser.add_argument("-f", "--file", type=str, required=True, help="File JSON di configurazione [obbligatorio]")
@@ -22,13 +23,5 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    Title = args.title
-    param_2 = args.url
-    param_3 = args.file
-    param_4 = args.language
-
-    # compongo l'url con i parametri che mi serviranno lato server
-    #Url = param_2 + "?config=" + param_3 + "&language=" + param_4
-
     # creo la form
-    App(Title, args.url, args.file,  args.language)
+    App(args.modulo, args.title, args.url, args.file,  args.language)

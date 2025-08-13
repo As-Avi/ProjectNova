@@ -21,6 +21,8 @@ import logging
 
 from models.filter import ComboListResponse
 
+SQL_SERVER =  "SqlServer"
+
 router = APIRouter(prefix="/api")
 
 load_dotenv()
@@ -60,7 +62,7 @@ async def combo(
     type = data["Type"]
     logger.info(f"view:{type}")
 
-    if type == "SqlServer":
+    if type == SQL_SERVER:
         listOfData = __loadDataComboSqlServer(data)
     elif type == "CSV":
         test =  ComboListResponse("Label", ["Option 1", "Option 2", "Option 3"])
@@ -132,7 +134,10 @@ def __loadDataSqlServer(data, filter):
     try:
         connectionString = data["ConnectionString"]
         query = data["Query"]
-        where = data["Filter"]
+        try:
+            where = data["Filter"]
+        except:
+            where = ''
 
         logger.info(f"__loadDataSqlServer:{connectionString}")
         logger.info(f"__loadDataSqlServer:{query}")
