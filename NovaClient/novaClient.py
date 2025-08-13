@@ -1,3 +1,4 @@
+from cProfile import label
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
@@ -59,15 +60,20 @@ class App(tk.Tk):
         self.toolbar_frame.pack(fill=tk.X, pady=(0, 10))
         # Combobox for endpoint selection
         if self.ComboList is not None:
+
+            clist = json.loads(self.ComboList)
+            label = clist["label"]
+            values = clist["values"]
+
             ttk.Label(
                 self.toolbar_frame,
-                text="Piano di spedizione:",
+                text=label,
                 font=("Arial", 12, "bold"),
             ).pack(side=tk.LEFT, padx=(0, 5))
 
             self.endpoint_combo = ttk.Combobox(
                 self.toolbar_frame,
-                values=self.ComboList,
+                values=values,
                 width=20,
                 font=("Arial", 12),
                 state="readonly",

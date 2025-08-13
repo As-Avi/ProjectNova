@@ -19,6 +19,8 @@ import pyodbc
 import json
 import logging
 
+from models.filter import ComboListResponse
+
 router = APIRouter(prefix="/api")
 
 load_dotenv()
@@ -43,12 +45,12 @@ logging.basicConfig(
 async def combo(config, language, request: Request, creds: HTTPBasicCredentials = Depends(basic)) -> Any:
     logger.info(f"combo:start Client Host: '{request.client.host}'")
 
-        # autenticazione
+    # autenticazione
     __authentication(creds)
     # controllo versione
     version: str = __getVersion(request)
 
-        # leggo il file di configurazione
+    # leggo il file di configurazione
     with open("config/" + config, "r") as file:
         data = json.load(file)
 
@@ -63,7 +65,15 @@ async def combo(config, language, request: Request, creds: HTTPBasicCredentials 
         logger.error(f"Wrong Type")
         raise HTTPException(status_code=502, detail="Wrong Type")
 
-    return listOfData
+    try:
+        label =  data["Label"]
+    except:
+        label = ''
+
+    r = ComboListResponse(label, listOfData)
+
+    return json.dumps(r.__dict__)
+
 
 @router.get("/view")
 async def get(

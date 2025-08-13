@@ -32,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="main.py" />
+    <Compile Include="models\filter.py" />
     <Compile Include="view.py" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +59,7 @@
     <Folder Include="cert\" />
     <Folder Include="data\" />
     <Folder Include="config\" />
+    <Folder Include="models\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
