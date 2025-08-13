@@ -38,11 +38,14 @@ logging.basicConfig(
     datefmt="%m/%d/%Y %I:%M:%S %p",
     filename="Nova_Server.log",
     encoding="utf-8",
-    level=log_level
+    level=log_level,
 )
 
+
 @router.get("/combo")
-async def combo(config, language, request: Request, creds: HTTPBasicCredentials = Depends(basic)) -> Any:
+async def combo(
+    config, language, request: Request, creds: HTTPBasicCredentials = Depends(basic)
+) -> Any:
     logger.info(f"combo:start Client Host: '{request.client.host}'")
 
     # autenticazione
@@ -60,24 +63,33 @@ async def combo(config, language, request: Request, creds: HTTPBasicCredentials 
     if type == "SqlServer":
         listOfData = __loadDataComboSqlServer(data)
     elif type == "CSV":
-        return ["Option 1", "Option 2", "Option 3"]
+        test =  ComboListResponse("Label", ["Option 1", "Option 2", "Option 3"])
+        return json.dumps(test.__dict__)
     else:
         logger.error(f"Wrong Type")
         raise HTTPException(status_code=502, detail="Wrong Type")
 
     try:
-        label =  data["Label"]
+        label = data["Label"]
     except:
-        label = ''
+        label = ""
 
+    # praticamente uso una classe per poi serializzarla in  json
+    # serve per aggiungere facilmente altri campi
+    # label = label del combo
+    # values = array di valori
     r = ComboListResponse(label, listOfData)
-
+    logger.info(r.__dict__)
     return json.dumps(r.__dict__)
 
 
 @router.get("/view")
 async def get(
-    config, language, filter, request: Request, creds: HTTPBasicCredentials = Depends(basic)
+    config,
+    language,
+    filter,
+    request: Request,
+    creds: HTTPBasicCredentials = Depends(basic),
 ) -> Any:
 
     logger.info(f"view:start config:'{config}' language:'{language}'")
@@ -128,10 +140,9 @@ def __loadDataSqlServer(data, filter):
         cn = pyodbc.connect(connectionString)
         cursor = cn.cursor()
 
-        sql = query + " " + where;
+        sql = query + " " + where
 
         sql_final = sql.format(filter)
-
 
         df = pd.read_sql(
             sql_final, cn
@@ -142,6 +153,7 @@ def __loadDataSqlServer(data, filter):
         raise HTTPException(status_code=500, detail=e.args[1])
 
     return df
+
 
 def __loadDataComboSqlServer(data):
     try:
@@ -165,6 +177,7 @@ def __loadDataComboSqlServer(data):
         raise HTTPException(status_code=500, detail=e.args[1])
 
     return None
+
 
 ########################################
 # authentication

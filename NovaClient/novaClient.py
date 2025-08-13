@@ -62,8 +62,8 @@ class App(tk.Tk):
         if self.ComboList is not None:
 
             clist = json.loads(self.ComboList)
-            label = clist["label"]
-            values = clist["values"]
+            label = clist["label"]  # label del copmbobox
+            values = clist["values"] #array di valori del combobox
 
             ttk.Label(
                 self.toolbar_frame,
