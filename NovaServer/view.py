@@ -20,8 +20,15 @@ import json
 import logging
 
 from models.filter import ComboListResponse
+from models.novaParams import ParIn
+from models.novaParams import ParOut
 
-SQL_SERVER =  "SqlServer"
+from typing import Annotated, Literal
+
+from fastapi import FastAPI, Query
+from pydantic import BaseModel, Field
+
+SQL_SERVER = "SqlServer"
 
 router = APIRouter(prefix="/api")
 
@@ -42,6 +49,31 @@ logging.basicConfig(
     encoding="utf-8",
     level=log_level,
 )
+
+
+@router.get("/")
+async def combo(
+    parIn: Annotated[ParIn, Query()],
+    request: Request,
+    creds: HTTPBasicCredentials = Depends(basic),
+) -> ParOut:
+
+    # autenticazione
+    __authentication(creds)
+    # controllo versione
+    version: str = __getVersion(request)
+
+    # leggo il file di configurazione
+    with open("config/" + parIn.config, "r") as file:
+        data = json.load(file)
+
+        
+    try:
+        title = data["Title"]
+    except:
+        title = ""
+
+    return ParOut(title = title,)
 
 
 @router.get("/combo")
@@ -65,7 +97,7 @@ async def combo(
     if type == SQL_SERVER:
         listOfData = __loadDataComboSqlServer(data)
     elif type == "CSV":
-        test =  ComboListResponse("Label", ["Option 1", "Option 2", "Option 3"])
+        test = ComboListResponse("Label", ["Option 1", "Option 2", "Option 3"])
         return json.dumps(test.__dict__)
     else:
         logger.error(f"Wrong Type")
@@ -137,7 +169,7 @@ def __loadDataSqlServer(data, filter):
         try:
             where = data["Filter"]
         except:
-            where = ''
+            where = ""
 
         logger.info(f"__loadDataSqlServer:{connectionString}")
         logger.info(f"__loadDataSqlServer:{query}")

@@ -17,10 +17,9 @@ from tkinter.messagebox import showinfo
 
 # This is a simple Tkinter application to display data from a JSON endpoint in a table format.
 class App(tk.Tk):
-    def __init__(self, modulo, title, url, file, language):
+    def __init__(self, modulo, url, file, language):
         self.modulo = modulo
         self.url = url
-        self.name = title
         self.file = file
         self.language = language
         self.config_file = "window_config.json"  # File per salvare le impostazioni
@@ -30,7 +29,7 @@ class App(tk.Tk):
 
         tk.Tk.__init__(self)
 
-        self.title(title)
+        self.title(self.loadConfig())
 
         # Carica le dimensioni e posizione salvate
         self.load_window_config()
@@ -44,7 +43,7 @@ class App(tk.Tk):
 
         # loadata from server for combo
         ######################################################
-        if self.modulo == '1' or self.modulo == 'VIEW_FILTERED':
+        if self.modulo == "1" or self.modulo == "FILTEREDVIEW":
             self.loadDataCombo()
         ######################################################
 
@@ -193,6 +192,28 @@ class App(tk.Tk):
         self.save_window_config()
         # Chiudi l'applicazione
         self.destroy()
+
+    def loadConfig(self):
+        try:
+            if self.url.startswith("http"):
+                responseData = self.loadJsonFromUrl(
+                    self.url
+                    + "/api"
+                    + "?config="
+                    + self.file
+                    + "&language="
+                    + self.language
+                )
+                return responseData["title"] 
+            else:
+                messagebox.showerror(
+                    title="Error",
+                    message=f"Invalid URL format. Please provide a valid URL starting with 'http'.",
+                )
+                return ''
+        except Exception as e:
+            messagebox.showerror(title="Error", message=f"Error loading data: {e}")
+            return ''
 
     # Load data from the specified URL
     def loadDataCombo(self):
