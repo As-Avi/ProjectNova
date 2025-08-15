@@ -1,6 +1,11 @@
 from pydantic import BaseModel
 from typing import List
 
+class ParInWithFilter(BaseModel):
+    config: str
+    language: str
+    filter:str
+
 class ParIn(BaseModel):
     config: str
     language: str

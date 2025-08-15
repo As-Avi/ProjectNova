@@ -62,8 +62,8 @@ class App(tk.Tk):
         # Combobox for endpoint selection
         if self.ComboList is not None:
 
-            label = self.ComboList['label']
-            values = self.ComboList['values']
+            label = self.ComboList["label"]
+            values = self.ComboList["values"]
 
             ttk.Label(
                 self.toolbar_frame,
@@ -205,13 +205,8 @@ class App(tk.Tk):
                 )
                 return responseData["title"]
             else:
-                messagebox.showerror(
-                    title="Error",
-                    message=f"Invalid URL format. Please provide a valid URL starting with 'http'.",
-                )
                 return ""
         except Exception as e:
-            messagebox.showerror(title="Error", message=f"Error loading data: {e}")
             return ""
 
     # Load data from the specified URL
@@ -228,17 +223,8 @@ class App(tk.Tk):
                 )
                 return True
             else:
-                messagebox.showerror(
-                    title="Error",
-                    message=f"Invalid URL format. Please provide a valid URL starting with 'http'.",
-                )
                 return False
-
-                # raise ValueError(
-                #     "Invalid URL format. Please provide a valid URL starting with 'http'."
-                # )
         except Exception as e:
-            messagebox.showerror(title="Error", message=f"Error loading data: {e}")
             return False
 
     # Load data from the specified URL
@@ -286,6 +272,7 @@ class App(tk.Tk):
         ret = self.loadData(filter)
         ######################################################
         if ret == False:
+            self.destroy()
             return
         # generate layout table with columns and header
         self.generateLayout(self.tree_frame, self.df)

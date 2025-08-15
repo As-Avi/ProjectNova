@@ -20,7 +20,7 @@ import json
 import logging
 
 
-from models.novaParams import ParIn, ParOut, ComboOut
+from models.novaParams import ParInWithFilter, ParIn, ParOut, ComboOut
 from typing import Annotated, Literal
 
 from fastapi import FastAPI, Query
@@ -113,14 +113,12 @@ async def combo(
 
 @router.get("/view")
 async def get(
-    config,
-    language,
-    filter,
+    parInWithFilter: Annotated[ParInWithFilter, Query()],
     request: Request,
     creds: HTTPBasicCredentials = Depends(basic),
 ) -> Any:
 
-    logger.info(f"view:start config:'{config}' language:'{language}'")
+    logger.info(f"view:start config:'{parInWithFilter.config}' language:'{parInWithFilter.language}'")
     logger.info(f"view:start Client Host: '{request.client.host}'")
 
     # autenticazione
@@ -129,14 +127,14 @@ async def get(
     version: str = __getVersion(request)
 
     # leggo il file di configurazione
-    with open("config/" + config, "r") as file:
+    with open("config/" + parInWithFilter.config, "r") as file:
         data = json.load(file)
 
     type = data["Type"]
     logger.info(f"view:{type}")
 
     if type == "SqlServer":
-        df = __loadDataSqlServer(data, filter)
+        df = __loadDataSqlServer(data, parInWithFilter.filter)
     elif type == "CSV":
         df = __loadDataCSV(data)
     else:
