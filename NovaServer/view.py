@@ -19,10 +19,8 @@ import pyodbc
 import json
 import logging
 
-from models.filter import ComboListResponse
-from models.novaParams import ParIn
-from models.novaParams import ParOut
 
+from models.novaParams import ParIn, ParOut, ComboOut
 from typing import Annotated, Literal
 
 from fastapi import FastAPI, Query
@@ -67,19 +65,22 @@ async def combo(
     with open("config/" + parIn.config, "r") as file:
         data = json.load(file)
 
-        
     try:
         title = data["Title"]
     except:
         title = ""
 
-    return ParOut(title = title,)
+    return ParOut(
+        title=title,
+    )
 
 
 @router.get("/combo")
 async def combo(
-    config, language, request: Request, creds: HTTPBasicCredentials = Depends(basic)
-) -> Any:
+    parIn: Annotated[ParIn, Query()],
+    request: Request,
+    creds: HTTPBasicCredentials = Depends(basic),
+) -> ComboOut:
     logger.info(f"combo:start Client Host: '{request.client.host}'")
 
     # autenticazione
@@ -88,7 +89,7 @@ async def combo(
     version: str = __getVersion(request)
 
     # leggo il file di configurazione
-    with open("config/" + config, "r") as file:
+    with open("config/" + parIn.config, "r") as file:
         data = json.load(file)
 
     type = data["Type"]
@@ -97,8 +98,7 @@ async def combo(
     if type == SQL_SERVER:
         listOfData = __loadDataComboSqlServer(data)
     elif type == "CSV":
-        test = ComboListResponse("Label", ["Option 1", "Option 2", "Option 3"])
-        return json.dumps(test.__dict__)
+        return ComboOut(label="Label", values = ["Option 1", "Option 2", "Option 3"])
     else:
         logger.error(f"Wrong Type")
         raise HTTPException(status_code=502, detail="Wrong Type")
@@ -108,13 +108,7 @@ async def combo(
     except:
         label = ""
 
-    # praticamente uso una classe per poi serializzarla in  json
-    # serve per aggiungere facilmente altri campi
-    # label = label del combo
-    # values = array di valori
-    r = ComboListResponse(label, listOfData)
-    logger.info(r.__dict__)
-    return json.dumps(r.__dict__)
+    return ComboOut(label=label, values = listOfData)
 
 
 @router.get("/view")

@@ -62,9 +62,8 @@ class App(tk.Tk):
         # Combobox for endpoint selection
         if self.ComboList is not None:
 
-            clist = json.loads(self.ComboList)
-            label = clist["label"]  # label del copmbobox
-            values = clist["values"]  # array di valori del combobox
+            label = self.ComboList['label']
+            values = self.ComboList['values']
 
             ttk.Label(
                 self.toolbar_frame,
@@ -204,16 +203,16 @@ class App(tk.Tk):
                     + "&language="
                     + self.language
                 )
-                return responseData["title"] 
+                return responseData["title"]
             else:
                 messagebox.showerror(
                     title="Error",
                     message=f"Invalid URL format. Please provide a valid URL starting with 'http'.",
                 )
-                return ''
+                return ""
         except Exception as e:
             messagebox.showerror(title="Error", message=f"Error loading data: {e}")
-            return ''
+            return ""
 
     # Load data from the specified URL
     def loadDataCombo(self):

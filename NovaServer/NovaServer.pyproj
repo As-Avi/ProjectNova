@@ -33,7 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="main.py" />
-    <Compile Include="models\filter.py" />
     <Compile Include="models\novaParams.py" />
     <Compile Include="view.py" />
   </ItemGroup>
