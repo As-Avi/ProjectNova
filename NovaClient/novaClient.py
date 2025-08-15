@@ -2,6 +2,7 @@ from cProfile import label
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
+from tkinter.ttk import Style
 import pandas as pd
 import requests
 from pandas.io.json import read_json
@@ -65,44 +66,38 @@ class App(tk.Tk):
             label = self.ComboList["label"]
             values = self.ComboList["values"]
 
+            style = Style()
+            style.configure(
+                "Nova.TButton", font=("calibri", 12, "bold"), foreground="black"
+            )
+            style.configure(
+                "Nova.TLabel", font=("calibri", 12, "bold"), foreground="black"
+            )
+            style.configure(
+                "Nova.TCombobox", font=("calibri", 12, "bold"), foreground="black"
+            )
+
             ttk.Label(
                 self.toolbar_frame,
                 text=label,
-                font=("Arial", 12, "bold"),
+                style="Nova.TLabel",
             ).pack(side=tk.LEFT, padx=(0, 5))
 
             self.endpoint_combo = ttk.Combobox(
                 self.toolbar_frame,
                 values=values,
                 width=20,
-                font=("Arial", 12),
+                style="Nova.TCombobox",
                 state="readonly",
             )
             self.endpoint_combo.pack(side=tk.LEFT, padx=(0, 10))
 
-        button = tk.Button(
+        button = ttk.Button(
             self.toolbar_frame,
-            text="Carica Dati (F10)",
+            text=self.translation("CARICA_DATI"),
             command=self.button_clicked,
-            activebackground="blue",
-            activeforeground="white",
-            anchor="center",
-            bd=3,
-            bg="lightgray",
+            style="Nova.TButton",
             cursor="hand2",
-            disabledforeground="gray",
-            fg="black",
-            font=("Arial", 12),
-            height=1,
-            highlightbackground="black",
-            highlightcolor="green",
-            highlightthickness=2,
-            # justify="right",
-            overrelief="raised",
-            padx=0,
-            pady=0,
-            width=15,
-            wraplength=0,
         )
 
         button.pack(padx=20, pady=20)
@@ -113,9 +108,26 @@ class App(tk.Tk):
         # create a label with info about the F10 key
         self.info_label = ttk.Label(
             self.tree_frame,
-            text="Premi F1 per l'help, F3 per la ricerca e F10 per aggiornare i dati",
+            text=self.translation("HELP"),
         )
         self.info_label.grid(row=2, column=0, columnspan=2, pady=5)
+
+
+    def translation(self, id)-> str:
+        if id == "CARICA_DATI":
+            if self.language == "Italian":
+                return " Carica Dati (F10) "
+            elif self.language == "English":
+                return " Load Data (F10) "
+            
+        if id == "HELP":
+            if self.language == "Italian":
+                return "Premi F1 per l'help, F3 per la ricerca e F10 per aggiornare i dati"
+            elif self.language == "English":
+                return "Press F1 for l'help, F3 for search and F10 to refresh data"
+
+        return id
+
 
     def button_clicked(self):
         self.loadView(True)
