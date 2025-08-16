@@ -1,5 +1,6 @@
 {
   "Title": "Piano di Spedizione Sedie",
+  "Module": "1",
   "Type": "SqlServer",
   "ConnectionString": "DRIVER={ODBC Driver 18 for SQL Server};Server=.\\sqlserver2019;UID=marco;PWD=malt0mare;DATABASE=TestDB;TrustServerCertificate=yes",
   "QueryCombo": "SELECT DISTINCT [manufacturer] FROM [dbo].[CSV_Merged] ORDER BY [manufacturer]",

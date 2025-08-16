@@ -17,13 +17,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Parametri da inserire.")
 
     parser.add_argument(
-        "-m",
-        "--modulo",
-        type=str,
-        required=True,
-        help="Modulo 0 = VIEW | 1 = FILTEREDVIEW [obbligatorio]",
-    )
-    parser.add_argument(
         "-u", "--url", type=str, required=True, help="URL del server [obbligatorio]"
     )
     parser.add_argument(
@@ -42,4 +35,4 @@ if __name__ == "__main__":
     user_lang = language.split("_")[0]
 
     # creo la form
-    App(args.modulo, args.url, args.file, user_lang)
+    App(args.url, args.file, user_lang)

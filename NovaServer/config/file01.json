@@ -1,5 +1,6 @@
 {
   "Title": "Piano di Spedizione Sedie",
+  "Module": "1",
   "Type": "SqlServer",
   "ConnectionString": "DRIVER={ODBC Driver 18 for SQL Server};Server=PONGO\\SQLSERVER2019;UID=marco;PWD=marco;DATABASE=P3Database;TrustServerCertificate=yes",
   "Query": "SELECT [Id],[CustomersEmail],[IsActive],[CustomerAddress_City],[CustomerAddress_Country],[CustomerAddress_PostalCode],[CustomerAddress_State],[CustomerAddress_Street],[Name],[Surname] FROM [Customer].[Customers]",

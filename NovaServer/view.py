@@ -70,9 +70,12 @@ async def combo(
     except:
         title = ""
 
-    return ParOut(
-        title=title,
-    )
+    try:
+        module = data["Module"]
+    except:
+        module = "0"
+
+    return ParOut(title=title, module=module)
 
 
 @router.get("/combo")
@@ -98,7 +101,7 @@ async def combo(
     if type == SQL_SERVER:
         listOfData = __loadDataComboSqlServer(data)
     elif type == "CSV":
-        return ComboOut(label="Label", values = ["Option 1", "Option 2", "Option 3"])
+        return ComboOut(label="Label", values=["Option 1", "Option 2", "Option 3"])
     else:
         logger.error(f"Wrong Type")
         raise HTTPException(status_code=502, detail="Wrong Type")
@@ -108,7 +111,7 @@ async def combo(
     except:
         label = ""
 
-    return ComboOut(label=label, values = listOfData)
+    return ComboOut(label=label, values=listOfData)
 
 
 @router.get("/view")
@@ -118,7 +121,9 @@ async def get(
     creds: HTTPBasicCredentials = Depends(basic),
 ) -> Any:
 
-    logger.info(f"view:start config:'{parInWithFilter.config}' language:'{parInWithFilter.language}'")
+    logger.info(
+        f"view:start config:'{parInWithFilter.config}' language:'{parInWithFilter.language}'"
+    )
     logger.info(f"view:start Client Host: '{request.client.host}'")
 
     # autenticazione

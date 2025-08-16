@@ -18,8 +18,8 @@ from tkinter.messagebox import showinfo
 
 # This is a simple Tkinter application to display data from a JSON endpoint in a table format.
 class App(tk.Tk):
-    def __init__(self, modulo, url, file, language):
-        self.modulo = modulo
+    def __init__(self, url, file, language):
+        self.modulo = "0"
         self.url = url
         self.file = file
         self.language = language
@@ -30,7 +30,8 @@ class App(tk.Tk):
 
         tk.Tk.__init__(self)
 
-        self.title(self.loadConfig())
+        title, self.modulo = self.loadConfig()
+        self.title(title)
 
         # Carica le dimensioni e posizione salvate
         self.load_window_config()
@@ -215,7 +216,7 @@ class App(tk.Tk):
                     + "&language="
                     + self.language
                 )
-                return responseData["title"]
+                return responseData["title"], responseData["module"]
             else:
                 return ""
         except Exception as e:
