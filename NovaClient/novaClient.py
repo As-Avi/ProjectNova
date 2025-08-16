@@ -218,9 +218,9 @@ class App(tk.Tk):
                 )
                 return responseData["title"], responseData["module"]
             else:
-                return ""
+                return "", ""
         except Exception as e:
-            return ""
+            return "", ""
 
     # Load data from the specified URL
     def loadDataCombo(self):

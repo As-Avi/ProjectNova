@@ -24,10 +24,10 @@
     <Content Include="cert\www.nova.net-2025-08-02-092933.csr" />
     <Content Include="cert\www.nova.net-2025-08-02-092933.p12" />
     <Content Include="cert\www.nova.net-2025-08-02-092933.pkey" />
-    <Content Include="config\file04.json" />
-    <Content Include="config\file03.json" />
-    <Content Include="config\file01.json" />
-    <Content Include="config\file02.json" />
+    <Content Include="config\sample04" />
+    <Content Include="config\sample03" />
+    <Content Include="config\sample01" />
+    <Content Include="config\sample02" />
     <Content Include="data\test.csv" />
     <Content Include="requirements.txt" />
   </ItemGroup>

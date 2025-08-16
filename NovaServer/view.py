@@ -50,32 +50,41 @@ logging.basicConfig(
 
 
 @router.get("/")
-async def combo(
+async def getConfig(
     parIn: Annotated[ParIn, Query()],
     request: Request,
     creds: HTTPBasicCredentials = Depends(basic),
 ) -> ParOut:
 
+    logger.info(f"getConfig:start Client Host: '{request.client.host}'")
     # autenticazione
     __authentication(creds)
     # controllo versione
     version: str = __getVersion(request)
 
     # leggo il file di configurazione
-    with open("config/" + parIn.config, "r") as file:
-        data = json.load(file)
+    data = __getData(parIn.config)
 
-    try:
-        title = data["Title"]
-    except:
-        title = ""
-
-    try:
-        module = data["Module"]
-    except:
-        module = "0"
+    title = __getValue(data["Title"], "")
+    module = __getValue(data["Module"], "0")
 
     return ParOut(title=title, module=module)
+
+
+def __getData(config):
+    try:
+        with open("config/" + config, "r") as file:
+            data = json.load(file)
+        return data
+    except Exception as e:
+        logger.error(f"Error in __getData: {str(e)}")
+        raise HTTPException(status_code=500, detail=e.args[1])
+
+def __getValue(data, defaultValue = "")->str:
+    try:
+        return data
+    except:
+        return defaultValue
 
 
 @router.get("/combo")
@@ -92,8 +101,7 @@ async def combo(
     version: str = __getVersion(request)
 
     # leggo il file di configurazione
-    with open("config/" + parIn.config, "r") as file:
-        data = json.load(file)
+    data = __getData(parIn.config)
 
     type = data["Type"]
     logger.info(f"view:{type}")
@@ -106,10 +114,7 @@ async def combo(
         logger.error(f"Wrong Type")
         raise HTTPException(status_code=502, detail="Wrong Type")
 
-    try:
-        label = data["Label"]
-    except:
-        label = ""
+    label = __getValue(data["Label"], "")
 
     return ComboOut(label=label, values=listOfData)
 
@@ -132,8 +137,7 @@ async def get(
     version: str = __getVersion(request)
 
     # leggo il file di configurazione
-    with open("config/" + parInWithFilter.config, "r") as file:
-        data = json.load(file)
+    data = __getData(parInWithFilter.config)
 
     type = data["Type"]
     logger.info(f"view:{type}")
@@ -163,10 +167,8 @@ def __loadDataSqlServer(data, filter):
     try:
         connectionString = data["ConnectionString"]
         query = data["Query"]
-        try:
-            where = data["Filter"]
-        except:
-            where = ""
+
+        where = __getValue(data["Filter"], "")
 
         logger.info(f"__loadDataSqlServer:{connectionString}")
         logger.info(f"__loadDataSqlServer:{query}")
