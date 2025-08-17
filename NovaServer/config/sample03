@@ -6,5 +6,6 @@
   "QueryFilter": "SELECT DISTINCT [manufacturer] FROM [dbo].[CSV_Merged] ORDER BY [manufacturer]",
   "Query": "SELECT [manufacturer],[model],[variantId],[variant],[menuIndexes],[oldInfo],[newInfo],[regions],[validFrom],[validTo],[softwareFunctions],[manufacturerId_score],[manufacturer_score],[modelId_score],[model_score],[modelCode_score],[variant_score],[validFrom_score],[validTo_score],[keyType_score],[pdScore_score] FROM [dbo].[CSV_Merged]",
   "Filter": "WHERE [manufacturer] = '{}'",
-  "Label": "Piano di Spedizione:"
+  "Label": "Piano di Spedizione:",
+  "Filters": "manufacturer,model"
 }

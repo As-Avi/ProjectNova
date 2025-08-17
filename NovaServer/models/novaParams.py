@@ -16,6 +16,7 @@ class ParIn(BaseModel):
 class ParOut(BaseModel):
     title: str
     module: str
+    findfields: str
 
 
 class ComboOut(BaseModel):

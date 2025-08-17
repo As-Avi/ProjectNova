@@ -27,12 +27,14 @@ class App(tk.Tk):
         self.ComboList = None
         self.endpoint_combo = None
         self.treeview = None
+        self.filters = ""
+        self.find_combo= None
 
         tk.Tk.__init__(self)
 
         # Carica i dati di configurazione
         ######################################################
-        title, self.modulo = self.loadConfig()
+        title, self.modulo, self.filters = self.loadConfig()
         ######################################################
         self.title(title)
 
@@ -225,11 +227,15 @@ class App(tk.Tk):
                     + "&language="
                     + self.language
                 )
-                return responseData["title"], responseData["module"]
+                return (
+                    responseData["title"],
+                    responseData["module"],
+                    responseData["findfields"],
+                )
             else:
                 return "", ""
         except Exception as e:
-            return "", ""
+            return "", "", ""
 
     # Load data from the specified URL
     def loadDataCombo(self):
@@ -279,7 +285,7 @@ class App(tk.Tk):
             return False
 
     # Start the main form and display the data
-    def loadView(self, cleanData=False, find="", caseSensitive = False):
+    def loadView(self, cleanData=False, find="", caseSensitive=False):
         self.change_cursor(True)
 
         if cleanData:
@@ -363,7 +369,7 @@ class App(tk.Tk):
     # Insert data into the Treeview
     def showData(self, treeview, df, find, caseSensitive):
         if find != "":
-           df = df[df["model"].str.contains(find, case=False)]
+            df = df[df["model"].str.contains(find, case=False)]
 
         r_set = df.to_numpy().tolist()
         a = 0
@@ -436,20 +442,29 @@ class App(tk.Tk):
         WIDTH = 300
         HEIGHT = 200
 
-        x = int((self.win .winfo_screenwidth() / 2) - (WIDTH / 2))
-        y = int((self.win .winfo_screenheight() / 2) - (HEIGHT / 2))
+        x = int((self.win.winfo_screenwidth() / 2) - (WIDTH / 2))
+        y = int((self.win.winfo_screenheight() / 2) - (HEIGHT / 2))
 
-        self.win .geometry(f'{WIDTH}x{HEIGHT}+{x}+{y}')
+        self.win.geometry(f"{WIDTH}x{HEIGHT}+{x}+{y}")
 
-        self.win.resizable(False, False) 
+        self.win.resizable(False, False)
         self.win.wm_title(self.translation("CERCA"))
 
-        self.name_var=tk.StringVar()
-        e1 = ttk.Entry(self.win, textvariable = self.name_var)
-        e1.grid(row=0, column=0)
+        self.find_combo = ttk.Combobox(
+                self.win,
+                values=self.filters.split(','),
+                style="Nova.TCombobox",
+                state="readonly",
+            ).grid(
+            row=0, column=0, sticky=tk.W
+        )
+
+        self.name_var = tk.StringVar()
+        e1 = ttk.Entry(self.win, textvariable=self.name_var)
+        e1.grid(row=1, column=0)
 
         ttk.Button(self.win, text=self.translation("CERCA"), command=self.find).grid(
-            row=1, column=0, sticky=tk.W
+            row=2, column=0, sticky=tk.W
         )
 
     def find(self):

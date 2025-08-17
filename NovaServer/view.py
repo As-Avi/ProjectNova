@@ -67,8 +67,9 @@ async def getConfig(
 
     title = __getValue(data["Title"], "")
     module = __getValue(data["Module"], "0")
+    filters = __getValue(data["Filters"], "")
 
-    return ParOut(title=title, module=module)
+    return ParOut(title=title, module=module, findfields= filters)
 
 
 def __getData(config):
