@@ -23,6 +23,7 @@ class App(tk.Tk):
         self.url = url
         self.file = file
         self.language = language
+        self.credentials_file = "credentials.json"  # File per le credenziali
         self.config_file = "window_config.json"  # File per salvare le impostazioni
         self.ComboList = None
         self.endpoint_combo = None
@@ -214,6 +215,18 @@ class App(tk.Tk):
         self.save_window_config()
         # Chiudi l'applicazione
         self.destroy()
+
+    def load_credentials(self):
+        try:
+            if os.path.exists(self.credentials_file):
+                with open(self.credentials_file, 'r') as f:
+                    creds = json.load(f)
+                return creds.get("user"), creds.get("password")
+        except Exception as e:
+            print(f"Errore nel caricamento credenziali: {e}")
+        
+        # Fallback alle variabili d'ambiente se il file non esiste
+        return os.getenv("USER"), os.getenv("PWD")
 
     # Carica i dati di configurazione
     def loadConfig(self):

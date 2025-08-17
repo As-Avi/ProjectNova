@@ -6,7 +6,7 @@
             "type": "debugpy",
             "request": "launch",
             "program": "main.py",
-            "args": ["-t", "Title", "-u", "http://localhost:8000/api/view", "-f", "file02.json", "-l", "it"]
+            "args": ["-u", "http://localhost:8000", "-f", "sample02"]
         }
     ]
 }

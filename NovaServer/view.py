@@ -48,10 +48,22 @@ logging.basicConfig(
     level=log_level,
 )
 
+@router.get("/auth")
+async def auth(
+    request: Request,
+    creds: HTTPBasicCredentials = Depends(basic),
+) -> str:
+    logger.info(f"auth:start Client Host: '{request.client.host}'")
+    # autenticazione
+    __authentication(creds)
+    # controllo versione
+    version: str = __getVersion(request)
+    return "ok"
 
 @router.get("/")
 async def getConfig(
-    parIn: Annotated[ParIn, Query()],
+    config: str,
+    language: str,
     request: Request,
     creds: HTTPBasicCredentials = Depends(basic),
 ) -> ParOut:
@@ -63,7 +75,7 @@ async def getConfig(
     version: str = __getVersion(request)
 
     # leggo il file di configurazione
-    data = __getData(parIn.config)
+    data = __getData(config)
 
     title = __getValue(data["Title"], "")
     module = __getValue(data["Module"], "0")
@@ -90,7 +102,8 @@ def __getValue(data, defaultValue = "")->str:
 
 @router.get("/combo")
 async def combo(
-    parIn: Annotated[ParIn, Query()],
+    config: str,
+    language: str,
     request: Request,
     creds: HTTPBasicCredentials = Depends(basic),
 ) -> ComboOut:
@@ -102,7 +115,7 @@ async def combo(
     version: str = __getVersion(request)
 
     # leggo il file di configurazione
-    data = __getData(parIn.config)
+    data = __getData(config)
 
     type = data["Type"]
     logger.info(f"view:{type}")
@@ -122,13 +135,15 @@ async def combo(
 
 @router.get("/view")
 async def get(
-    parInWithFilter: Annotated[ParInWithFilter, Query()],
+    config: str,
+    language: str,
+    filter: str,
     request: Request,
     creds: HTTPBasicCredentials = Depends(basic),
 ) -> Any:
 
     logger.info(
-        f"view:start config:'{parInWithFilter.config}' language:'{parInWithFilter.language}'"
+        f"view:start config:'{config}' language:'{language}'"
     )
     logger.info(f"view:start Client Host: '{request.client.host}'")
 
@@ -138,13 +153,13 @@ async def get(
     version: str = __getVersion(request)
 
     # leggo il file di configurazione
-    data = __getData(parInWithFilter.config)
+    data = __getData(config)
 
     type = data["Type"]
     logger.info(f"view:{type}")
 
     if type == "SqlServer":
-        df = __loadDataSqlServer(data, parInWithFilter.filter)
+        df = __loadDataSqlServer(data, filter)
     elif type == "CSV":
         df = __loadDataCSV(data)
     else:
