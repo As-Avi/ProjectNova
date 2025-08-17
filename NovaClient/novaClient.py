@@ -30,7 +30,10 @@ class App(tk.Tk):
 
         tk.Tk.__init__(self)
 
+        # Carica i dati di configurazione
+        ######################################################
         title, self.modulo = self.loadConfig()
+        ######################################################
         self.title(title)
 
         # Carica le dimensioni e posizione salvate
@@ -51,7 +54,7 @@ class App(tk.Tk):
 
         # chiamata al server per caricare i dati per caricare il combobox
         self.prepare()
-        self.loadView(False)
+        self.loadView(False, "", False)
         self.mainloop()
 
     # Prepare the main frame and treeview for displaying data
@@ -113,29 +116,34 @@ class App(tk.Tk):
         )
         self.info_label.grid(row=2, column=0, columnspan=2, pady=5)
 
-
-    def translation(self, id)-> str:
+    def translation(self, id) -> str:
         if id == "CARICA_DATI":
             if self.language == "Italian":
                 return " Carica Dati (F10) "
             elif self.language == "English":
                 return " Load Data (F10) "
-            
+
         if id == "HELP":
             if self.language == "Italian":
-                return "Premi F1 per l'help, F3 per la ricerca e F10 per aggiornare i dati"
+                return (
+                    "Premi F1 per l'help, F3 per la ricerca e F10 per aggiornare i dati"
+                )
             elif self.language == "English":
                 return "Press F1 for l'help, F3 for search and F10 to refresh data"
 
+        if id == "CERCA":
+            if self.language == "Italian":
+                return "Cerca"
+            elif self.language == "English":
+                return "Find"
+
         return id
 
-
     def button_clicked(self):
-        self.loadView(True)
+        self.loadView(True, "", False)
 
-    # Load window configuration from file
+    # Carica la configurazione della finestra dal file JSON
     def load_window_config(self):
-        # Carica la configurazione della finestra dal file JSON
         try:
             if os.path.exists(self.config_file):
                 with open(self.config_file, "r") as f:
@@ -170,8 +178,8 @@ class App(tk.Tk):
             print(f"Errore nel caricamento configurazione: {e}")
             self.geometry("1200x500+100+100")
 
+    # Salva la configurazione attuale della finestra nel file JSON
     def save_window_config(self):
-        # Salva la configurazione attuale della finestra nel file JSON
         try:
             # Ottieni dimensioni e posizione attuali
             geometry = self.geometry()
@@ -205,6 +213,7 @@ class App(tk.Tk):
         # Chiudi l'applicazione
         self.destroy()
 
+    # Carica i dati di configurazione
     def loadConfig(self):
         try:
             if self.url.startswith("http"):
@@ -270,7 +279,7 @@ class App(tk.Tk):
             return False
 
     # Start the main form and display the data
-    def loadView(self, cleanData=False):
+    def loadView(self, cleanData=False, find="", caseSensitive = False):
         self.change_cursor(True)
 
         if cleanData:
@@ -291,7 +300,7 @@ class App(tk.Tk):
         self.generateLayout(self.tree_frame, self.df)
 
         # show data in table
-        self.showData(self.treeview, self.df)
+        self.showData(self.treeview, self.df, find, caseSensitive)
 
         # create a vertical scrollbar
         v_scrollbar = ttk.Scrollbar(
@@ -352,13 +361,15 @@ class App(tk.Tk):
         tree.heading(col, command=lambda: self.sort_treeview(tree, col, not descending))
 
     # Insert data into the Treeview
-    def showData(self, treeview, df):
+    def showData(self, treeview, df, find, caseSensitive):
+        if find != "":
+           df = df[df["model"].str.contains(find, case=False)]
+
         r_set = df.to_numpy().tolist()
         a = 0
         for dt in r_set:
-            a = a + 1
             v = [r for r in dt]
-            # qua aggiungere filtro con tkinter
+            a = a + 1
             if a % 2 == 0:
                 treeview.insert("", tk.END, values=v, tags=("oddrow",))
             else:
@@ -412,7 +423,7 @@ class App(tk.Tk):
             print("F3 is pressed")
             self.popup_find()
         elif event.keysym == "F10":  # F10 REFRESH
-            self.loadView(True)
+            self.loadView(True, "", False)
 
     # Function to clean the Treeview
     def clean(self):
@@ -421,13 +432,26 @@ class App(tk.Tk):
                 self.treeview.delete(i)
 
     def popup_find(self):
-        win = tk.Toplevel(self)
-        win.geometry("300x200")
-        win.wm_title("Window")
+        self.win = tk.Toplevel(self)
+        WIDTH = 300
+        HEIGHT = 200
 
-        e1 = tk.Entry(win)
+        x = int((self.win .winfo_screenwidth() / 2) - (WIDTH / 2))
+        y = int((self.win .winfo_screenheight() / 2) - (HEIGHT / 2))
+
+        self.win .geometry(f'{WIDTH}x{HEIGHT}+{x}+{y}')
+
+        self.win.resizable(False, False) 
+        self.win.wm_title(self.translation("CERCA"))
+
+        self.name_var=tk.StringVar()
+        e1 = ttk.Entry(self.win, textvariable = self.name_var)
         e1.grid(row=0, column=0)
 
-        tk.Button(win, text="Find", command=self.clean).grid(
+        ttk.Button(self.win, text=self.translation("CERCA"), command=self.find).grid(
             row=1, column=0, sticky=tk.W
         )
+
+    def find(self):
+        self.loadView(True, self.name_var.get(), False)
+        self.win.destroy()

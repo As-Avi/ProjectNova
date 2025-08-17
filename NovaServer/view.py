@@ -107,7 +107,7 @@ async def combo(
     logger.info(f"view:{type}")
 
     if type == SQL_SERVER:
-        listOfData = __loadDataComboSqlServer(data)
+        listOfData = __loadDataFilterSqlServer(data)
     elif type == "CSV":
         return ComboOut(label="Label", values=["Option 1", "Option 2", "Option 3"])
     else:
@@ -191,13 +191,13 @@ def __loadDataSqlServer(data, filter):
     return df
 
 
-def __loadDataComboSqlServer(data):
+def __loadDataFilterSqlServer(data):
     try:
         connectionString = data["ConnectionString"]
-        query = data["QueryCombo"]
+        query = data["QueryFilter"]
 
-        logger.info(f"__loadDataComboSqlServer:{connectionString}")
-        logger.info(f"__loadDataComboSqlServer:{query}")
+        logger.info(f"__loadDataFilterSqlServer:{connectionString}")
+        logger.info(f"__loadDataFilterSqlServer:{query}")
         # drivers = pyodbc.drivers()
         cn = pyodbc.connect(connectionString)
         cursor = cn.cursor()
@@ -209,7 +209,7 @@ def __loadDataComboSqlServer(data):
 
         return results
     except Exception as e:
-        logger.error(f"Error in __loadDataComboSqlServer: {str(e)}")
+        logger.error(f"Error in __loadDataFilterSqlServer: {str(e)}")
         raise HTTPException(status_code=500, detail=e.args[1])
 
     return None
