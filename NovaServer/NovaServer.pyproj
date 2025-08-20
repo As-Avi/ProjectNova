@@ -30,6 +30,8 @@
     <Content Include="config\sample02" />
     <Content Include="data\test.csv" />
     <Content Include="requirements.txt" />
+    <Content Include="resources\it.json" />
+    <Content Include="resources\en.json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="main.py" />
@@ -68,6 +70,7 @@
     <Folder Include="data\" />
     <Folder Include="config\" />
     <Folder Include="models\" />
+    <Folder Include="resources\" />
     <Folder Include="repositories\" />
     <Folder Include="services\" />
     <Folder Include="services\__pycache__\" />

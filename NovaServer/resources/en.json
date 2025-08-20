@@ -1,0 +1,15 @@
+
+[
+  {
+    "id": "CARICA_DATI",
+    "name": " Load Data (F10) "
+  },
+  {
+    "id": "HELP",
+    "name": "Press F1 for l'help, F3 for search and F10 to refresh data"
+  },
+  {
+    "id": "CERCA",
+    "name": "Find"
+  }
+]

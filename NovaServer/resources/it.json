@@ -1,0 +1,8 @@
+[
+    { "id": "CARICA_DATI", "name" :"Carica Dati (F10) "},
+  {
+    "id": "HELP", "name" :"Premi F1 per l'help, F3 per la ricerca e F10 per aggiornare i dati"
+  },
+    { "id":"CERCA", "name":"Cerca" }
+  ]
+

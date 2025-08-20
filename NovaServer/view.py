@@ -16,13 +16,15 @@ from dotenv import load_dotenv
 import time
 import json
 import logging
+from pydantic.json import pydantic_encoder
+from pydantic import TypeAdapter, ValidationError
 
 from repositories.SqlServer import SqlServer
 from repositories.Csv import Csv
 
 from services.viewservice import viewservice
 
-from models.novaParams import ParInWithFilter, ParIn, ParOut, ComboOut
+from models.novaParams import ParInWithFilter, ParIn, ParOut, ComboOut, Item, ItemList
 from typing import Annotated, Literal
 
 from fastapi import FastAPI, Query
@@ -90,7 +92,19 @@ async def getConfig(
     module = __getValue(data["Module"], "0")
     filters = __getValue(data["Filters"], "")
 
-    return ParOut(title=title, module=module, findfields=filters)
+    try:
+        items = __get_lang_content(language)
+        # data_json = json.dumps(items, default=pydantic_encoder)
+        user_list_adapter = TypeAdapter(list[Item])
+        user_list = user_list_adapter.validate_python(items)
+    except ValidationError as e:
+        logger.error(e)
+        raise HTTPException(status_code=502, detail=e)
+    except Exception as ex:
+        logger.error(ex)
+        raise HTTPException(status_code=502, detail=ex)
+
+    return ParOut(title=title, module=module, findfields=filters, items=user_list)
 
 
 ############################################
@@ -120,6 +134,7 @@ async def combo(
         logger.error(f"Wrong Type")
         raise HTTPException(status_code=502, detail=e)
 
+
 ############################################
 # API Load Data
 ############################################
@@ -147,7 +162,7 @@ async def get(
         v = viewservice(data)
         return v.laodView(filter)
     except Exception as e:
-        logger.error(f"Wrong Type")
+        logger.error(e)
         raise HTTPException(status_code=502, detail=e)
 
 
@@ -198,3 +213,18 @@ def __getVersion(request: Request) -> str:
         version = "1.0"
 
     return version
+
+
+def __get_lang_content(language: str):
+    if language.casefold() == "english":
+        with open("resources/en.json", "r") as en_file:
+            en_data = json.load(en_file)
+        return en_data
+    elif language.casefold() == "italian":
+        with open("resources/it.json", "r") as it_file:
+            it_data = json.load(it_file)
+        return it_data
+    else:
+        with open("resources/it.json", "r") as en_file:
+            en_data = json.load(en_file)
+        return en_data
