@@ -43,6 +43,7 @@
     <Compile Include="services\viewservice.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="utilities\misc.py" />
     <Compile Include="view.py" />
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +71,7 @@
     <Folder Include="data\" />
     <Folder Include="config\" />
     <Folder Include="models\" />
+    <Folder Include="utilities\" />
     <Folder Include="resources\" />
     <Folder Include="repositories\" />
     <Folder Include="services\" />

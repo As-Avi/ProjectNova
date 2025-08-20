@@ -9,3 +9,4 @@ NovaClient/dist
 NovaServer/repositories/__pycache__
 NovaServer/services/__pycache__
 NovaServer/models/__pycache__
+NovaServer/utilities/__pycache__

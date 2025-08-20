@@ -3,27 +3,29 @@ from models.novaParams import ParInWithFilter, ParIn, ParOut, ComboOut
 from repositories.SqlServer import SqlServer
 from repositories.Csv import Csv
 
+from utilities.misc import DataSafe
 
 class viewservice:
     def __init__(self, data):
         self.data = data
+        self.type = self.data["Type"]
         self.SQL_SERVER = "SqlServer"
+        self.connectionString = self.data["ConnectionString"]
+        self.query = self.data["Query"]
+        self.where = DataSafe().getValueString(self.data, "Filter", "")
 
     ############################################
     # Load Combo data
     ############################################
     def loadCombo(self):
-
-        type = self.data["Type"]
-
-        if type == self.SQL_SERVER:
+        if self.type == self.SQL_SERVER:
             listOfData = self.__loadDataFilterSqlServer()
-        elif type == "CSV":
+        elif self.type == "CSV":
             return ComboOut(label="Label", values=["Option 1", "Option 2", "Option 3"])
         else:
             raise Exception("Wrong Type")
 
-        label = self.__getValue(self.data["Label"], "")
+        label = DataSafe().getValueString(self.data, "Label", "")
 
         return ComboOut(label=label, values=listOfData)
 
@@ -31,21 +33,17 @@ class viewservice:
     # Load Combo data SQL Server
     ############################################
     def __loadDataFilterSqlServer(self):
-        connectionString = self.data["ConnectionString"]
-        query = self.data["QueryFilter"]
-
-        sqlServer = SqlServer(connectionString)
-        return sqlServer.loadDataFilterSqlServer(query)
+        sqlServer = SqlServer(self.connectionString)
+        queryFilter = DataSafe().getValueString(self.data, "QueryFilter", "")
+        return sqlServer.loadDataFilterSqlServer(queryFilter)
 
     ############################################
     # Load data View
     ############################################
     def laodView(self, filter: str):
-        type = self.data["Type"]
-
-        if type == "SqlServer":
+        if self.type == "SqlServer":
             df = self.__loadDataSqlServer(filter)
-        elif type == "CSV":
+        elif self.type == "CSV":
             df = self.__loadDataCSV()
         else:
             raise Exception("Wrong Type")
@@ -60,13 +58,8 @@ class viewservice:
     ############################################
     def __loadDataSqlServer(self, filter):
         try:
-            connectionString = self.data["ConnectionString"]
-            query = self.data["Query"]
-
-            where = self.__getValue(self.data["Filter"], "")
-
-            sqlServer = SqlServer(connectionString)
-            return sqlServer.loadDataSqlServer(query, where, filter)
+            sqlServer = SqlServer(self.connectionString)
+            return sqlServer.loadDataSqlServer(self.query, self.where, filter)
 
         except Exception as e:
             raise Exception(e.args[1])
@@ -79,8 +72,3 @@ class viewservice:
     def __loadDataCSV(self):
         return Csv().loadDataCSV(self.data["File"])  # da migliorare gestione errore
 
-    def __getValue(self, item, defaultValue="") -> str:
-        try:
-            return item
-        except:
-            return defaultValue

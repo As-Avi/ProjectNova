@@ -30,6 +30,7 @@ from typing import Annotated, Literal
 from fastapi import FastAPI, Query
 from pydantic import BaseModel, Field
 
+from utilities.misc import DataSafe
 
 router = APIRouter(prefix="/api")
 
@@ -51,7 +52,6 @@ logging.basicConfig(
     level=log_level,
 )
 
-
 ############################################
 # API Authentication
 ############################################
@@ -65,7 +65,7 @@ async def auth(
     __authentication(creds)
     # controllo versione
     version: str = __getVersion(request)
-    return "ok"
+    return "OK"
 
 
 ############################################
@@ -88,15 +88,17 @@ async def getConfig(
     # leggo il file di configurazione
     data = __getData(config)
 
-    title = __getValue(data["Title"], "")
-    module = __getValue(data["Module"], "0")
-    filters = __getValue(data["Filters"], "")
+    title =  DataSafe().getValueString(data, "Title", "")
+    module =  DataSafe().getValueString(data, "Module", "0")
+
+    if module == "1":
+        filters =  DataSafe().getValueString(data, "Filters", "")
 
     try:
-        items = __get_lang_content(language)
+        messages = __get_lang_content(language)
         # data_json = json.dumps(items, default=pydantic_encoder)
         user_list_adapter = TypeAdapter(list[Item])
-        user_list = user_list_adapter.validate_python(items)
+        user_list = user_list_adapter.validate_python(messages)
     except ValidationError as e:
         logger.error(e)
         raise HTTPException(status_code=502, detail=e)
@@ -131,7 +133,7 @@ async def combo(
         v = viewservice(data)
         return v.loadCombo()
     except Exception as e:
-        logger.error(f"Wrong Type")
+        logger.error(e)
         raise HTTPException(status_code=502, detail=e)
 
 
@@ -179,14 +181,7 @@ def __getData(config):
         raise HTTPException(status_code=500, detail=e.args[1])
 
 
-########################################
-# get data from array without rise error
-########################################
-def __getValue(data, defaultValue="") -> str:
-    try:
-        return data
-    except:
-        return defaultValue
+
 
 
 ########################################
@@ -214,7 +209,9 @@ def __getVersion(request: Request) -> str:
 
     return version
 
-
+########################################
+# menage resource files
+########################################
 def __get_lang_content(language: str):
     if language.casefold() == "english":
         with open("resources/en.json", "r") as en_file:
