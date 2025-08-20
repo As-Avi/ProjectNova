@@ -38,6 +38,9 @@
     <Compile Include="repositories\SqlServer.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="services\viewservice.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="view.py" />
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +69,8 @@
     <Folder Include="config\" />
     <Folder Include="models\" />
     <Folder Include="repositories\" />
+    <Folder Include="services\" />
+    <Folder Include="services\__pycache__\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

@@ -6,3 +6,6 @@ NovaServer/__pycache__
 NovaClient/__pycache__
 NovaClient/build
 NovaClient/dist
+NovaServer/repositories/__pycache__
+NovaServer/services/__pycache__
+NovaServer/models/__pycache__

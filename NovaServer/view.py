@@ -20,13 +20,14 @@ import logging
 from repositories.SqlServer import SqlServer
 from repositories.Csv import Csv
 
+from services.viewservice import viewservice
+
 from models.novaParams import ParInWithFilter, ParIn, ParOut, ComboOut
 from typing import Annotated, Literal
 
 from fastapi import FastAPI, Query
 from pydantic import BaseModel, Field
 
-SQL_SERVER = "SqlServer"
 
 router = APIRouter(prefix="/api")
 
@@ -49,6 +50,9 @@ logging.basicConfig(
 )
 
 
+############################################
+# API Authentication
+############################################
 @router.get("/auth")
 async def auth(
     request: Request,
@@ -62,6 +66,9 @@ async def auth(
     return "ok"
 
 
+############################################
+# API Get Configuration
+############################################
 @router.get("/")
 async def getConfig(
     config: str,
@@ -86,23 +93,9 @@ async def getConfig(
     return ParOut(title=title, module=module, findfields=filters)
 
 
-def __getData(config):
-    try:
-        with open("config/" + config, "r") as file:
-            data = json.load(file)
-        return data
-    except Exception as e:
-        logger.error(f"Error in __getData: {str(e)}")
-        raise HTTPException(status_code=500, detail=e.args[1])
-
-
-def __getValue(data, defaultValue="") -> str:
-    try:
-        return data
-    except:
-        return defaultValue
-
-
+############################################
+# API Laod Combo
+############################################
 @router.get("/combo")
 async def combo(
     config: str,
@@ -117,25 +110,19 @@ async def combo(
     # controllo versione
     version: str = __getVersion(request)
 
-    # leggo il file di configurazione
-    data = __getData(config)
+    try:
+        # leggo il file di configurazione
+        data = __getData(config)
 
-    type = data["Type"]
-    logger.info(f"view:{type}")
-
-    if type == SQL_SERVER:
-        listOfData = __loadDataFilterSqlServer(data)
-    elif type == "CSV":
-        return ComboOut(label="Label", values=["Option 1", "Option 2", "Option 3"])
-    else:
+        v = viewservice(data)
+        return v.loadCombo()
+    except Exception as e:
         logger.error(f"Wrong Type")
-        raise HTTPException(status_code=502, detail="Wrong Type")
+        raise HTTPException(status_code=502, detail=e)
 
-    label = __getValue(data["Label"], "")
-
-    return ComboOut(label=label, values=listOfData)
-
-
+############################################
+# API Load Data
+############################################
 @router.get("/view")
 async def get(
     config: str,
@@ -153,68 +140,38 @@ async def get(
     # controllo versione
     version: str = __getVersion(request)
 
-    # leggo il file di configurazione
-    data = __getData(config)
+    try:
+        # leggo il file di configurazione
+        data = __getData(config)
 
-    type = data["Type"]
-    logger.info(f"view:{type}")
-
-    if type == "SqlServer":
-        df = __loadDataSqlServer(data, filter)
-    elif type == "CSV":
-        df = __loadDataCSV(data)
-    else:
+        v = viewservice(data)
+        return v.laodView(filter)
+    except Exception as e:
         logger.error(f"Wrong Type")
-        raise HTTPException(status_code=502, detail="Wrong Type")
-
-    if df is None:
-        logger.error(f"Empty Data Frame")
-        raise HTTPException(status_code=501, detail="Empty Data Frame")
-
-    logger.info("view:end")
-
-    return df.to_json(orient="records")
+        raise HTTPException(status_code=502, detail=e)
 
 
-def __loadDataCSV(data):
-    return Csv().loadDataCSV(data["File"])  # da migliorare gestione errore
-
-
-def __loadDataSqlServer(data, filter):
+############################################
+# return configuration data from config file
+############################################
+def __getData(config):
     try:
-        connectionString = data["ConnectionString"]
-        query = data["Query"]
-
-        where = __getValue(data["Filter"], "")
-
-        logger.info(f"__loadDataSqlServer:{connectionString}")
-        logger.info(f"__loadDataSqlServer:{query}")
-
-        sqlServer = SqlServer(connectionString)
-        return sqlServer.loadDataSqlServer(query, where, filter)
-
+        with open("config/" + config, "r") as file:
+            data = json.load(file)
+        return data
     except Exception as e:
-        logger.error(f"Error in __loadDataSqlServer: {str(e)}")
+        logger.error(f"Error in __getData: {str(e)}")
         raise HTTPException(status_code=500, detail=e.args[1])
 
-    return df
 
-
-def __loadDataFilterSqlServer(data):
+########################################
+# get data from array without rise error
+########################################
+def __getValue(data, defaultValue="") -> str:
     try:
-        connectionString = data["ConnectionString"]
-        query = data["QueryFilter"]
-
-        logger.info(f"__loadDataFilterSqlServer:{connectionString}")
-        logger.info(f"__loadDataFilterSqlServer:{query}")
-
-        sqlServer = SqlServer(connectionString)
-        return sqlServer.loadDataFilterSqlServer(query)
-    except Exception as e:
-        logger.error(f"Error in __loadDataFilterSqlServer: {str(e)}")
-        raise HTTPException(status_code=500, detail=e.args[1])
-
-    return None
+        return data
+    except:
+        return defaultValue
 
 
 ########################################
