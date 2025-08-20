@@ -6,7 +6,7 @@
             "type": "debugpy",
             "request": "launch",
             "program": "main.py",
-            "args": ["-u", "http://localhost:8000", "-f", "sample02"]
+            "args": ["-u", "http://localhost:8000", "-f", "sample02", "-i"]
         }
     ]
 }

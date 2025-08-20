@@ -5,10 +5,15 @@ import os
 import requests
 from requests.auth import HTTPBasicAuth
 
+class Credentials:
+    def __init__(self, username="", password=""):
+        self.username = username
+        self.password = password
+
 class CredentialsDialog:
     def __init__(self, test_url=None):
         self.result = False
-        self.credentials_file = "credentials.json"
+        self.credentials = Credentials()
         self.test_url = test_url  # URL per testare le credenziali
         
     def show_dialog(self):
@@ -68,7 +73,10 @@ class CredentialsDialog:
         
         # Bottone Invio - usando tk.Button invece di ttk.Button per miglior controllo
         save_btn = tk.Button(button_frame, text="Invio", 
-                            command=self.save_credentials, #modificare per non salvare le credenziali sul file ma su una variabile locale
+                            command=lambda: self.test_credentials_validity(
+                                self.username_entry.get(), 
+                                self.password_entry.get()
+                            ),  
                             bg="#4CAF50", fg="white", font=("Arial", 12, "bold"),
                             relief="raised", bd=2, padx=20, pady=8,
                             activebackground="#45a049", activeforeground="white")
@@ -118,6 +126,13 @@ class CredentialsDialog:
         else:
             self.password_entry.configure(show="*")
     
+    def save_credentials(self):
+        self.result = True
+        self.root.destroy()
+    
+    def get_credentials(self):
+        return self.credentials
+    
     
     def test_credentials_validity(self, username, password):
         """Testa la validità delle credenziali facendo una chiamata di prova"""
@@ -125,6 +140,10 @@ class CredentialsDialog:
             # Se non c'è un URL di test specifico, salta la validazione
             if not self.test_url:
                 self.info_label.configure(text="Test saltato - nessun URL di verifica", fg="#f39c12", bg="#fff3cd")
+                # Salva le credenziali anche senza test
+                self.credentials.username = username
+                self.credentials.password = password
+                self.save_credentials()
                 return True
             
             response = requests.get(
@@ -136,6 +155,10 @@ class CredentialsDialog:
             
             if response.status_code == 200:
                 self.info_label.configure(text="Credenziali valide!", fg="#27ae60", bg="#d4edda")
+                # Salva le credenziali quando la validazione ha successo
+                self.credentials.username = username
+                self.credentials.password = password
+                self.save_credentials()
                 return True
             elif response.status_code == 401:
                 self.info_label.configure(text="Credenziali non valide!", fg="#e74c3c", bg="#f8d7da")
@@ -176,9 +199,13 @@ class CredentialsDialog:
 def show_credentials_dialog(test_url=None):
     """Funzione helper per mostrare il dialogo delle credenziali"""
     dialog = CredentialsDialog(test_url)
-    return dialog.show_dialog()
+    success = dialog.show_dialog()
+    return success, dialog.get_credentials() if success else None
 
 # Test standalone
 if __name__ == "__main__":
-    result = show_credentials_dialog()
-    print(f"Risultato: {result}")
+    success, credentials = show_credentials_dialog()
+    print(f"Successo: {success}")
+    if credentials:
+        print(f"Username: {credentials.username}")
+        print(f"Password: {'*' * len(credentials.password)}")  # Nasconde la password per sicurezza

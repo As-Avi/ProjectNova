@@ -399,8 +399,10 @@ class App(tk.Tk):
 
     # Function to load data from a URL
     def loadDataFromUrl(self, url):
-        secret_user = os.getenv("USER")
-        secret_password = os.getenv("PWD")
+        secret_user, secret_password = self.load_credentials()
+        if not secret_user or not secret_password:
+            raise Exception("Credenziali non trovate. Assicurati di averle configurate.")
+
         version = os.getenv("VERSION")
         response = requests.get(
             url,
