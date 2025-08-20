@@ -14,11 +14,11 @@ import uvicorn
 import os, errno
 from dotenv import load_dotenv
 import time
-import pandas as pd
-import pyodbc
 import json
 import logging
 
+from repositories.SqlServer import SqlServer
+from repositories.Csv import Csv
 
 from models.novaParams import ParInWithFilter, ParIn, ParOut, ComboOut
 from typing import Annotated, Literal
@@ -48,6 +48,7 @@ logging.basicConfig(
     level=log_level,
 )
 
+
 @router.get("/auth")
 async def auth(
     request: Request,
@@ -59,6 +60,7 @@ async def auth(
     # controllo versione
     version: str = __getVersion(request)
     return "ok"
+
 
 @router.get("/")
 async def getConfig(
@@ -81,7 +83,7 @@ async def getConfig(
     module = __getValue(data["Module"], "0")
     filters = __getValue(data["Filters"], "")
 
-    return ParOut(title=title, module=module, findfields= filters)
+    return ParOut(title=title, module=module, findfields=filters)
 
 
 def __getData(config):
@@ -93,7 +95,8 @@ def __getData(config):
         logger.error(f"Error in __getData: {str(e)}")
         raise HTTPException(status_code=500, detail=e.args[1])
 
-def __getValue(data, defaultValue = "")->str:
+
+def __getValue(data, defaultValue="") -> str:
     try:
         return data
     except:
@@ -142,9 +145,7 @@ async def get(
     creds: HTTPBasicCredentials = Depends(basic),
 ) -> Any:
 
-    logger.info(
-        f"view:start config:'{config}' language:'{language}'"
-    )
+    logger.info(f"view:start config:'{config}' language:'{language}'")
     logger.info(f"view:start Client Host: '{request.client.host}'")
 
     # autenticazione
@@ -176,7 +177,7 @@ async def get(
 
 
 def __loadDataCSV(data):
-    return pd.read_csv("data/" + data["File"])  # da migliorare gestione errore
+    return Csv().loadDataCSV(data["File"])  # da migliorare gestione errore
 
 
 def __loadDataSqlServer(data, filter):
@@ -188,18 +189,10 @@ def __loadDataSqlServer(data, filter):
 
         logger.info(f"__loadDataSqlServer:{connectionString}")
         logger.info(f"__loadDataSqlServer:{query}")
-        # drivers = pyodbc.drivers()
-        cn = pyodbc.connect(connectionString)
-        cursor = cn.cursor()
 
-        sql = query + " " + where
+        sqlServer = SqlServer(connectionString)
+        return sqlServer.loadDataSqlServer(query, where, filter)
 
-        sql_final = sql.format(filter)
-
-        df = pd.read_sql(
-            sql_final, cn
-        )  # warning perch� Sql server non � un database nativo di pandas (usare SQLAlchemy)
-        return df
     except Exception as e:
         logger.error(f"Error in __loadDataSqlServer: {str(e)}")
         raise HTTPException(status_code=500, detail=e.args[1])
@@ -214,16 +207,9 @@ def __loadDataFilterSqlServer(data):
 
         logger.info(f"__loadDataFilterSqlServer:{connectionString}")
         logger.info(f"__loadDataFilterSqlServer:{query}")
-        # drivers = pyodbc.drivers()
-        cn = pyodbc.connect(connectionString)
-        cursor = cn.cursor()
-        cursor.execute(query)
-        results = []
-        rows = cursor.fetchall()
-        for row in rows:
-            results.append(row[0])
 
-        return results
+        sqlServer = SqlServer(connectionString)
+        return sqlServer.loadDataFilterSqlServer(query)
     except Exception as e:
         logger.error(f"Error in __loadDataFilterSqlServer: {str(e)}")
         raise HTTPException(status_code=500, detail=e.args[1])

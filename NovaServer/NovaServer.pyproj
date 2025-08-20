@@ -34,6 +34,10 @@
   <ItemGroup>
     <Compile Include="main.py" />
     <Compile Include="models\novaParams.py" />
+    <Compile Include="repositories\Csv.py" />
+    <Compile Include="repositories\SqlServer.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="view.py" />
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +65,7 @@
     <Folder Include="data\" />
     <Folder Include="config\" />
     <Folder Include="models\" />
+    <Folder Include="repositories\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
