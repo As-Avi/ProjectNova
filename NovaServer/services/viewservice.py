@@ -5,15 +5,25 @@ from repositories.Csv import Csv
 
 from utilities.misc import DataSafe
 
+from enum import Enum, IntEnum
+
+
+class DataSourceType(Enum):
+    SQL_SERVER = "SqlServer"
+    CSV = "CSV"
+
+
 class viewservice:
     def __init__(self, data):
+        self.SQL_SERVER = DataSourceType.SQL_SERVER.value
+        self.CSV = DataSourceType.CSV.value
+
         self.data = data
         self.type = self.data["Type"]
-        self.SQL_SERVER = "SqlServer"
-        self.CSV = "CSV"
-        self.connectionString = DataSafe().getValueString(self.data, "ConnectionString", "")
-        self.query = DataSafe().getValueString(self.data, "Query", "")
-        self.where = DataSafe().getValueString(self.data, "Filter", "")
+
+        self.connectionString = DataSafe().getValueString(self.data, "ConnectionString")
+        self.query = DataSafe().getValueString(self.data, "Query")
+        self.where = DataSafe().getValueString(self.data, "Filter")
 
     ############################################
     # Load Combo data
@@ -22,11 +32,11 @@ class viewservice:
         if self.type == self.SQL_SERVER:
             listOfData = self.__loadDataFilterSqlServer()
         elif self.type == self.CSV:
-            return Csv().loadComboCSV();
+            return Csv().loadComboCSV()
         else:
             raise Exception("Wrong Type")
 
-        label = DataSafe().getValueString(self.data, "Label", "")
+        label = DataSafe().getValueString(self.data, "Label")
 
         return ComboOut(label=label, values=listOfData)
 
@@ -35,7 +45,7 @@ class viewservice:
     ############################################
     def __loadDataFilterSqlServer(self):
         sqlServer = SqlServer(self.connectionString)
-        queryFilter = DataSafe().getValueString(self.data, "QueryFilter", "")
+        queryFilter = DataSafe().getValueString(self.data, "QueryFilter")
         return sqlServer.loadDataFilterSqlServer(queryFilter)
 
     ############################################
@@ -66,4 +76,3 @@ class viewservice:
     ############################################
     def __loadDataCSV(self):
         return Csv().loadDataCSV(self.data["File"])  # da migliorare gestione errore
-
