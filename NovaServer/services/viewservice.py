@@ -10,8 +10,9 @@ class viewservice:
         self.data = data
         self.type = self.data["Type"]
         self.SQL_SERVER = "SqlServer"
-        self.connectionString = self.data["ConnectionString"]
-        self.query = self.data["Query"]
+        self.CSV = "CSV"
+        self.connectionString = DataSafe().getValueString(self.data, "ConnectionString", "")
+        self.query = DataSafe().getValueString(self.data, "Query", "")
         self.where = DataSafe().getValueString(self.data, "Filter", "")
 
     ############################################
@@ -20,8 +21,8 @@ class viewservice:
     def loadCombo(self):
         if self.type == self.SQL_SERVER:
             listOfData = self.__loadDataFilterSqlServer()
-        elif self.type == "CSV":
-            return ComboOut(label="Label", values=["Option 1", "Option 2", "Option 3"])
+        elif self.type == self.CSV:
+            return Csv().loadComboCSV();
         else:
             raise Exception("Wrong Type")
 
@@ -41,9 +42,9 @@ class viewservice:
     # Load data View
     ############################################
     def laodView(self, filter: str):
-        if self.type == "SqlServer":
+        if self.type == self.SQL_SERVER:
             df = self.__loadDataSqlServer(filter)
-        elif self.type == "CSV":
+        elif self.type == self.CSV:
             df = self.__loadDataCSV()
         else:
             raise Exception("Wrong Type")
@@ -57,14 +58,8 @@ class viewservice:
     # Load data View SQL Server
     ############################################
     def __loadDataSqlServer(self, filter):
-        try:
-            sqlServer = SqlServer(self.connectionString)
-            return sqlServer.loadDataSqlServer(self.query, self.where, filter)
-
-        except Exception as e:
-            raise Exception(e.args[1])
-
-        return df
+        sqlServer = SqlServer(self.connectionString)
+        return sqlServer.loadDataSqlServer(self.query, self.where, filter)
 
     ############################################
     # Load data View CSV file
