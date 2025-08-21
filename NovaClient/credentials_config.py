@@ -147,7 +147,7 @@ class CredentialsDialog:
                 return True
             
             response = requests.get(
-                self.test_url+"/auth",
+                self.test_url+"/api/auth",
                 auth=HTTPBasicAuth(username, password),
                 timeout=10,
                 verify=False

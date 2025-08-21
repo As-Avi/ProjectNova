@@ -19,7 +19,8 @@ class viewservice:
         self.CSV = DataSourceType.CSV.value
 
         self.data = data
-        self.type = self.data["Type"]
+        self.module = self.data["Module"] # 0 | 1 | 2
+        self.type = self.data["Type"] # SqlServer | CSV
 
         self.connectionString = DataSafe().getValueString(self.data, "ConnectionString")
         self.query = DataSafe().getValueString(self.data, "Query")

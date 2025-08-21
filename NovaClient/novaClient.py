@@ -18,18 +18,19 @@ from tkinter.messagebox import showinfo
 
 # This is a simple Tkinter application to display data from a JSON endpoint in a table format.
 class App(tk.Tk):
-    def __init__(self, url, file, language):
+    def __init__(self, url, file, language, login_inter, cred):
         self.modulo = "0"
         self.url = url
         self.file = file
         self.language = language
-        self.credentials_file = "credentials.json"  # File per le credenziali
         self.config_file = "window_config.json"  # File per salvare le impostazioni
         self.ComboList = None
         self.endpoint_combo = None
         self.treeview = None
         self.filters = ""
-        self.find_combo= None
+        self.find_combo = None
+        self.login_inter = login_inter
+        self.credential = cred
 
         tk.Tk.__init__(self)
 
@@ -217,16 +218,11 @@ class App(tk.Tk):
         self.destroy()
 
     def load_credentials(self):
-        try:
-            if os.path.exists(self.credentials_file):
-                with open(self.credentials_file, 'r') as f:
-                    creds = json.load(f)
-                return creds.get("user"), creds.get("password")
-        except Exception as e:
-            print(f"Errore nel caricamento credenziali: {e}")
-        
         # Fallback alle variabili d'ambiente se il file non esiste
-        return os.getenv("USER"), os.getenv("PWD")
+        if self.login_inter:
+            return self.credential.username, self.credential.password
+        else:
+            return os.getenv("USER"), os.getenv("PWD")
 
     # Carica i dati di configurazione
     def loadConfig(self):
@@ -401,7 +397,9 @@ class App(tk.Tk):
     def loadDataFromUrl(self, url):
         secret_user, secret_password = self.load_credentials()
         if not secret_user or not secret_password:
-            raise Exception("Credenziali non trovate. Assicurati di averle configurate.")
+            raise Exception(
+                "Credenziali non trovate. Assicurati di averle configurate."
+            )
 
         version = os.getenv("VERSION")
         response = requests.get(
@@ -419,8 +417,12 @@ class App(tk.Tk):
             )
 
     def loadJsonFromUrl(self, url):
-        secret_user = os.getenv("USER")
-        secret_password = os.getenv("PWD")
+        secret_user, secret_password = self.load_credentials()
+        if not secret_user or not secret_password:
+            raise Exception(
+                "Credenziali non trovate. Assicurati di averle configurate."
+            )
+
         version = os.getenv("VERSION")
         response = requests.get(
             url,
@@ -466,13 +468,11 @@ class App(tk.Tk):
         self.win.wm_title(self.translation("CERCA"))
 
         self.find_combo = ttk.Combobox(
-                self.win,
-                values=self.filters.split(','),
-                style="Nova.TCombobox",
-                state="readonly",
-            ).grid(
-            row=0, column=0, sticky=tk.W
-        )
+            self.win,
+            values=self.filters.split(","),
+            style="Nova.TCombobox",
+            state="readonly",
+        ).grid(row=0, column=0, sticky=tk.W)
 
         self.name_var = tk.StringVar()
         e1 = ttk.Entry(self.win, textvariable=self.name_var)

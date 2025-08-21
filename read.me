@@ -23,4 +23,9 @@ pip install pyarmor
 
 pyarmor gen <filename>.py
 
-ricordarsi di deistribuire anche la directory dist
+ricordarsi di deistribuire anche la directory dist e sostituire il file originale con quello offuscato
+
+Per installare Sql Server su un contenitore Linux
+docker pull mcr.microsoft.com/mssql/server:2022-latest
+docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Yu1223hedud!" -p 1433:1433 --name sql1 --hostname sql1 -d mcr.microsoft.com/mssql/server:2022-latest
+eseguire script sql\Nova.sql

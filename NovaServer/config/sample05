@@ -1,0 +1,11 @@
+{
+  "Title": "Piano di Spedizione Sedie",
+  "Module": "1",
+  "Type": "SqlServer",
+  "ConnectionString": "DRIVER={ODBC Driver 18 for SQL Server};Server=localhost,1433;UID=sa;PWD=Malt0mare!;DATABASE=NovaDB;TrustServerCertificate=yes",
+  "QueryFilter": "  SELECT DISTINCT [PianoDiSpedizione] FROM [dbo].[PianoDiSpedizione] ORDER BY [PianoDiSpedizione]",
+  "Query": "SELECT [OrdineEvolution],[RiferimentoOrdineCliente],[Cliente],[Articolo],[Descrizione],[NotaCommerciale],[NotaTecnica],[QtaResidua] FROM [dbo].[PianoDiSpedizione]",
+  "Filter": "WHERE [PianoDiSpedizione] = '{}'",
+  "Label": "Piano di Spedizione:",
+  "Filters": "OrdineEvolution,RiferimentoOrdineCliente,Cliente,Articolo"
+}

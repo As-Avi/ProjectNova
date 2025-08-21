@@ -24,7 +24,7 @@ from repositories.Csv import Csv
 
 from services.viewservice import viewservice
 
-from models.novaParams import ParInWithFilter, ParIn, ParOut, ComboOut, Item, ItemList
+from models.novaParams import ParInWithFilter, ParIn, ParOut, ComboOut, Item
 from typing import Annotated, Literal
 
 from fastapi import FastAPI, Query
@@ -88,15 +88,14 @@ async def getConfig(
     # leggo il file di configurazione
     data = __getData(config)
 
-    title =  DataSafe().getValueString(data, "Title", "")
+    title =  DataSafe().getValueString(data, "Title")
     module =  DataSafe().getValueString(data, "Module", "0")
 
     if module == "1":
-        filters =  DataSafe().getValueString(data, "Filters", "")
+        filters =  DataSafe().getValueString(data, "Filters")
 
     try:
         messages = __get_lang_content(language)
-        # data_json = json.dumps(items, default=pydantic_encoder)
         user_list_adapter = TypeAdapter(list[Item])
         user_list = user_list_adapter.validate_python(messages)
     except ValidationError as e:

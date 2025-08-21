@@ -24,6 +24,7 @@
     <Content Include="cert\www.nova.net-2025-08-02-092933.csr" />
     <Content Include="cert\www.nova.net-2025-08-02-092933.p12" />
     <Content Include="cert\www.nova.net-2025-08-02-092933.pkey" />
+    <Content Include="config\sample05" />
     <Content Include="config\sample04" />
     <Content Include="config\sample03" />
     <Content Include="config\sample01" />

@@ -9,7 +9,7 @@ class Csv:
      # Load Data from CSV
      ############################################
      def loadDataCSV(self, file: str):
-        return pd.read_csv("data/" +file)
+        return pd.read_csv("data/" + file)
 
      def loadComboCSV(self):
          return ComboOut(label="Label", values=["Option 1", "Option 2", "Option 3"])
