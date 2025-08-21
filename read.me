@@ -17,6 +17,8 @@ pyinstaller main.py -n Nova --noconsole --onefile
 questo comando + molto più velioce a caricare l'eseguibile
 pyinstaller main.py -n Nova --noconsole --onedir --hide-console minimize-early
 
+per lanciarlo
+Nova.exe -u http://localhost:8000 -f sample03 -i
 
 per offuscare il server
 pip install pyarmor
@@ -29,3 +31,6 @@ Per installare Sql Server su un contenitore Linux
 docker pull mcr.microsoft.com/mssql/server:2022-latest
 docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Yu1223hedud!" -p 1433:1433 --name sql1 --hostname sql1 -d mcr.microsoft.com/mssql/server:2022-latest
 eseguire script sql\Nova.sql
+
+
+
