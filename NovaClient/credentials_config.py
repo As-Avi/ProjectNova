@@ -15,7 +15,8 @@ class CredentialsDialog:
         self.result = False
         self.credentials = Credentials()
         self.test_url = test_url  # URL per testare le credenziali
-        
+     
+    #Mostra la finestra di dialogo per inserire le credenziali
     def show_dialog(self):
         """Mostra la finestra di dialogo per inserire le credenziali"""
         self.root = tk.Tk()
@@ -69,7 +70,7 @@ class CredentialsDialog:
         
         # Frame per i bottoni
         button_frame = ttk.Frame(main_frame)
-        button_frame.pack(fill=tk.X, pady=20)
+        button_frame.pack()
         
         # Bottone Invio - usando tk.Button invece di ttk.Button per miglior controllo
         save_btn = tk.Button(button_frame, text="Invio", 
@@ -110,8 +111,8 @@ class CredentialsDialog:
         
         return self.result
     
+    #Centra la finestra sullo schermo
     def center_window(self):
-        """Centra la finestra sullo schermo"""
         self.root.update_idletasks()
         width = self.root.winfo_width()
         height = self.root.winfo_height()
@@ -119,8 +120,8 @@ class CredentialsDialog:
         y = (self.root.winfo_screenheight() // 2) - (height // 2)
         self.root.geometry(f"{width}x{height}+{x}+{y}")
     
+    #Mostra/nasconde la password"
     def toggle_password_visibility(self):
-        """Mostra/nasconde la password"""
         if self.show_password_var.get():
             self.password_entry.configure(show="")
         else:
@@ -133,9 +134,8 @@ class CredentialsDialog:
     def get_credentials(self):
         return self.credentials
     
-    
+    #Testa la validità delle credenziali facendo una chiamata di prova
     def test_credentials_validity(self, username, password):
-        """Testa la validità delle credenziali facendo una chiamata di prova"""
         try:
             # Se non c'è un URL di test specifico, salta la validazione
             if not self.test_url:
@@ -195,9 +195,8 @@ class CredentialsDialog:
         """Annulla l'operazione"""
         self.result = False
         self.root.destroy()
-
+#Funzione helper per mostrare il dialogo delle credenziali
 def show_credentials_dialog(test_url=None):
-    """Funzione helper per mostrare il dialogo delle credenziali"""
     dialog = CredentialsDialog(test_url)
     success = dialog.show_dialog()
     return success, dialog.get_credentials() if success else None
