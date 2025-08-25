@@ -6,5 +6,6 @@
   "Query": "SELECT [Id],[CustomersEmail],[IsActive],[CustomerAddress_City],[CustomerAddress_Country],[CustomerAddress_PostalCode],[CustomerAddress_State],[CustomerAddress_Street],[Name],[Surname] FROM [Customer].[Customers]",
   "QueryFilter": "SELECT DISTINCT [Surname] FROM [Customer].[Customers]",
   "Filter": "WHERE [Surname] = '{}'",
-  "Label": "Piano di Spedizione:"
+  "Label": "Piano di Spedizione:",
+  "Filters": "CustomersEmail"
 }

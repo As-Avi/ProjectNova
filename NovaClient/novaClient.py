@@ -378,7 +378,8 @@ class App(tk.Tk):
     # Insert data into the Treeview
     def showData(self, treeview, df, find, caseSensitive):
         if find != "":
-            df = df[df["model"].str.contains(find, case=False)]
+            combo_value = self.name_varCombo.get()
+            df = df[df[combo_value].str.contains(find, case=False)]
 
         r_set = df.to_numpy().tolist()
         a = 0
@@ -467,11 +468,13 @@ class App(tk.Tk):
         self.win.resizable(False, False)
         self.win.wm_title(self.translation("CERCA"))
 
+        self.name_varCombo = tk.StringVar()
         self.find_combo = ttk.Combobox(
             self.win,
             values=self.filters.split(","),
             style="Nova.TCombobox",
             state="readonly",
+            textvariable=self.name_varCombo
         ).grid(row=0, column=0, sticky=tk.W)
 
         self.name_var = tk.StringVar()
