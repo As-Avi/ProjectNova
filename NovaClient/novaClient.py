@@ -96,19 +96,13 @@ class App(tk.Tk):
                 values=values,
                 width=20,
                 style="Nova.TCombobox",
-                state="readonly",
+                state="readonly"
             )
+
+            self.endpoint_combo.bind('<<ComboboxSelected>>', self.modified)  
+
             self.endpoint_combo.pack(side=tk.LEFT, padx=(0, 10))
 
-        button = ttk.Button(
-            self.toolbar_frame,
-            text=self.translation("CARICA_DATI"),
-            command=self.button_clicked,
-            style="Nova.TButton",
-            cursor="hand2",
-        )
-
-        button.pack(padx=20, pady=20)
 
         # Create a container frame for the treeview
         self.tree_frame = ttk.Frame(self.frame)
@@ -119,6 +113,10 @@ class App(tk.Tk):
             text=self.translation("HELP"),
         )
         self.info_label.grid(row=2, column=0, columnspan=2, pady=5)
+
+
+    def modified (self, event) :
+        self.loadView(True, "", False)
 
     def translation(self, id) -> str:
         if id == "CARICA_DATI":
@@ -142,9 +140,6 @@ class App(tk.Tk):
                 return "Find"
 
         return id
-
-    def button_clicked(self):
-        self.loadView(True, "", False)
 
     # Carica la configurazione della finestra dal file JSON
     def load_window_config(self):
