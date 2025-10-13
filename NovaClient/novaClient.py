@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from requests.auth import HTTPBasicAuth
 
 from tkinter.messagebox import showinfo
-
+from threading import Thread
 
 # This is a simple Tkinter application to display data from a JSON endpoint in a table format.
 class App(tk.Tk):
@@ -50,6 +50,8 @@ class App(tk.Tk):
         self.bind("<Key>", self.key_press)
         # self.bind("<Motion>", self.change_cursor)
 
+        self.change_cursor(True)
+
         # loadata from server for combo
         ######################################################
         if self.modulo == "1" or self.modulo == "FILTEREDVIEW":
@@ -59,6 +61,7 @@ class App(tk.Tk):
         # chiamata al server per caricare i dati per caricare il combobox
         self.prepare()
         self.loadView(False, "", False)
+
         self.mainloop()
 
     # Prepare the main frame and treeview for displaying data
@@ -116,7 +119,11 @@ class App(tk.Tk):
 
 
     def modified (self, event) :
-        self.loadView(True, "", False)
+        self.change_cursor(True)
+        t1 = Thread(target = self.loadView, args = (True, "", False))
+        t1.start()
+
+
 
     def translation(self, id) -> str:
         if id == "CARICA_DATI":
@@ -287,10 +294,12 @@ class App(tk.Tk):
         except Exception as e:
             messagebox.showerror(title="Error", message=f"Error loading data: {e}")
             return False
+   
 
     # Start the main form and display the data
     def loadView(self, cleanData=False, find="", caseSensitive=False):
-        self.change_cursor(True)
+       # self.change_cursor(True)
+    
 
         if cleanData:
             self.clean()
@@ -338,13 +347,16 @@ class App(tk.Tk):
 
         self.change_cursor(False)
 
+
     # Function to change the cursor style
     def change_cursor(self, event):
         try:
             if event == True:
-                self.config(cursor="circle")
+                self.config(cursor="watch")
+                self.update()
             else:
-                self.config(cursor="arrow")
+                self.config(cursor="")
+                self.update()
         finally:
             pass
 
@@ -483,3 +495,5 @@ class App(tk.Tk):
     def find(self):
         self.loadView(True, self.name_var.get(), False)
         self.win.destroy()
+
+    

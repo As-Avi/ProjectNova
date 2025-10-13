@@ -2,6 +2,6 @@
   "Title": "Piano di Spedizione Sedie",
   "Module": "1",
   "Type": "CSV",
-  "Filters": "",
+  "Filters": "WHERE Gruppo = '{}'",
   "File": "test.csv"
 }

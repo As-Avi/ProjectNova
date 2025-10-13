@@ -3,7 +3,7 @@
   "Module": "1",
   "Type": "SqlServer",
   "ConnectionString": "DRIVER={ODBC Driver 18 for SQL Server};Server=PONGO\\SQLSERVER2019;UID=marco;PWD=marco;DATABASE=P3Database;TrustServerCertificate=yes",
-  "Query": "SELECT [Id],[CustomersEmail],[IsActive],[CustomerAddress_City],[CustomerAddress_Country],[CustomerAddress_PostalCode],[CustomerAddress_State],[CustomerAddress_Street],[Name],[Surname] FROM [Customer].[Customers]",
+  "Query": "SELECT [Id],[CustomersEmail] AS Email,CAST([IsActive] as int) AS IsActive,[CustomerAddress_City] AS City,[CustomerAddress_Country] AS Country,[CustomerAddress_PostalCode] AS [Postal Code],[CustomerAddress_State] AS State,[CustomerAddress_Street] AS Street,[Name] AS Name,[Surname] AS Surname FROM [Customer].[Customers]",
   "QueryFilter": "SELECT DISTINCT [Surname] FROM [Customer].[Customers]",
   "Filter": "WHERE [Surname] = '{}'",
   "Label": "Piano di Spedizione:",

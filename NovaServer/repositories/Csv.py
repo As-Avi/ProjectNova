@@ -12,4 +12,4 @@ class Csv:
         return pd.read_csv("data/" + file)
 
      def loadComboCSV(self):
-         return ComboOut(label="Label", values=["Option 1", "Option 2", "Option 3"])
+         return ComboOut(label="Label", values=["Gruppo 1", "Gruppo 2", "Gruppo 3", "Gruppo 4", "Gruppo 5", "Gruppo 6", "Gruppo 7", "Gruppo 8", "Gruppo 9", "Gruppo 10"])
