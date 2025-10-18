@@ -1,0 +1,11 @@
+{
+  "SERVER_URL": "http://localhost:8000/api/",
+  "USER_NAME":"user",
+  "PASSWORD":"user",
+  "MENU": "",
+  "THEME_COLORS": {
+    "PRIMARY": "#007bff",
+    "SECONDARY": "#fc3"
+  },
+  "PROCEDURE": ["", "sample01", "sample02", "sample03", "sample04", "sample05"]
+}

@@ -11,3 +11,4 @@ NovaServer/services/__pycache__
 NovaServer/models/__pycache__
 NovaServer/utilities/__pycache__
 NovaServer/models/__pycache__
+NovaServer/dist
