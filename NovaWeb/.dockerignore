@@ -1,0 +1,10 @@
+node_modules
+build
+.git
+.vscode
+.refactor-backup
+npm-debug.log*
+Dockerfile
+docker-compose.yml
+.dockerignore
+README.md

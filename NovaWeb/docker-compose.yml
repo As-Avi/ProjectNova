@@ -1,0 +1,13 @@
+services:
+  novaweb:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      # Backend raggiungibile dal container. Esempi:
+      #   http://host.docker.internal:8000/api/   (backend sul PC host)
+      #   http://backend:8000/api/                (altro servizio/container in questa rete)
+      BACKEND_URL: http://host.docker.internal:8000/api/
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

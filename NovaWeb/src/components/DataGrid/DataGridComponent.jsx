@@ -2,9 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import Form from 'react-bootstrap/Form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortUp, faSortDown, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortUp, faSortDown, faXmark, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import configData from '../../config.json';
 import { filterItems, sortItems, nextSort } from './dataGridUtils';
+import { buildXlsx, buildFileName, downloadXlsx } from './excelExport';
 import './DataGridComponent.css';
 
 const TITLE = 'Piano di Spedizione';
@@ -101,6 +102,17 @@ export default function DataGridComponent() {
     setColumnFilters({});
   }, []);
 
+  // Esporta esattamente ciò che si vede: righe filtrate e ordinate, nello stesso ordine di colonne.
+  const exportToExcel = useCallback(() => {
+    try {
+      const bytes = buildXlsx({ columns, rows: visibleItems, sheetName: selected });
+      downloadXlsx(bytes, buildFileName(TITLE, selected));
+    } catch (err) {
+      console.error('Error exporting to Excel:', err);
+      setError("Impossibile esportare i dati in Excel.");
+    }
+  }, [columns, visibleItems, selected]);
+
   const setColumnFilter = (column, value) =>
     setColumnFilters((prev) => ({ ...prev, [column]: value }));
 
@@ -141,6 +153,16 @@ export default function DataGridComponent() {
                 </button>
               )}
             </div>
+
+            <button
+              type="button"
+              className="btn btn-success grid-toolbar__export"
+              onClick={exportToExcel}
+              disabled={loading || visibleItems.length === 0}
+              title="Esporta in Excel le righe attualmente visibili (filtri e ordinamento inclusi)"
+            >
+              <FontAwesomeIcon icon={faFileExcel} /> Esporta in Excel
+            </button>
           </>
         )}
       </div>
