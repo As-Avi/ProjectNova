@@ -1,48 +1,88 @@
+.grid-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin: 10px;
+}
 
-.select
-{
+.grid-toolbar__select {
+  min-width: 220px;
   width: 30%;
 }
-.combo{
-  margin-top: 10px;
-  margin-bottom: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
-}
-/* .App {
-  text-align: center;
+
+.grid-toolbar__search {
+  min-width: 240px;
+  width: 30%;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.grid-toolbar__status {
+  color: #6c757d;
+  padding-bottom: 0.4rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.grid-message {
+  margin: 10px;
+  color: #6c757d;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Contenitore scorrevole: l'intestazione resta visibile scorrendo le righe */
+.grid-scroll {
+  max-height: 70vh;
+  overflow: auto;
+  margin: 0 10px 10px;
+  border: 1px solid #dee2e6;
+}
+
+.nova-grid {
+  --grid-row-odd: #ffffff;
+  --grid-row-even: #eef4fb;
+  --grid-row-hover: #d9e7f7;
+  --grid-head-bg: #e3ebf5;
+  margin-bottom: 0;
+}
+
+/* Righe a colori alternati (Bootstrap legge --bs-table-bg dalla riga) */
+.nova-grid tbody tr:nth-child(odd)  { --bs-table-bg: var(--grid-row-odd); }
+.nova-grid tbody tr:nth-child(even) { --bs-table-bg: var(--grid-row-even); }
+.nova-grid tbody tr:hover           { --bs-table-bg: var(--grid-row-hover); }
+
+.nova-grid thead th {
+  position: sticky;
+  z-index: 1;
+  background-color: var(--grid-head-bg);
+  white-space: nowrap;
+}
+.nova-grid thead tr:first-child th { top: 0; }
+.nova-grid thead tr.nova-grid__filters th {
+  top: 2.4rem; /* altezza della riga di intestazione */
+  font-weight: normal;
+  padding: 0.25rem;
+}
+
+.nova-grid__sort {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.nova-grid__sort:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
 }
 
-.App-link {
-  color: #61dafb;
+.sort-icon { color: #adb5bd; }
+.sort-icon--active { color: #0d6efd; }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-} */
+.nova-grid__empty td {
+  text-align: center;
+  color: #6c757d;
+  padding: 1rem;
+}
